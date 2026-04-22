@@ -81,7 +81,7 @@ async function startServer() {
       const response = await retryAI(() => 
         axios.post('https://platform.beeknoee.com/api/v1/chat/completions', req.body, {
           headers: { 'Authorization': `Bearer ${BEEKNOEE_API_KEY}`, 'Content-Type': 'application/json' },
-          timeout: 45000 // 45 seconds timeout
+          timeout: 60000 // 60 seconds timeout
         })
       );
       res.json(response.data);
@@ -104,7 +104,7 @@ async function startServer() {
       const response = await retryAI(() => 
         axios.post('https://api.mistral.ai/v1/chat/completions', req.body, {
           headers: { 'Authorization': `Bearer ${MISTRAL_API_KEY}`, 'Content-Type': 'application/json' },
-          timeout: 45000 // 45 seconds timeout
+          timeout: 60000 // 60 seconds timeout
         })
       );
       res.json(response.data);

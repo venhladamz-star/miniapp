@@ -1067,7 +1067,7 @@ function FoodView({ t }: { t: any }) {
   const [ingredients, setIngredients] = useState('');
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
-  const [model, setModel] = useState<'glm-4.7-flash' | 'qwen-3-235b' | 'gpt-oss-120b' | 'mistral'>('glm-4.7-flash');
+  const [model, setModel] = useState<'glm-4.7-flash' | 'qwen-3-235b' | 'gpt-oss-120b' | 'deepseek-chat' | 'mistral'>('glm-4.7-flash');
 
   const getSuggestion = async () => {
     if (!ingredients.trim()) return;
@@ -1098,7 +1098,8 @@ function FoodView({ t }: { t: any }) {
       } else if (e.response?.status === 524 || e.code === 'ECONNABORTED') {
         setResult("⚠️ AI Timeout: Server took too long to respond. The AI might be overloaded, please try again with simpler ingredients.");
       } else {
-        setResult("⚠️ " + t('weather_error'));
+        const errorDetail = e.response?.data?.error?.message || e.response?.data?.error || e.message;
+        setResult(`⚠️ Error: ${errorDetail}`);
       }
     } finally {
       setLoading(false);
@@ -1116,7 +1117,7 @@ function FoodView({ t }: { t: any }) {
         <div className="mb-6">
           <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('select_model')}</label>
           <div className="flex flex-wrap gap-2">
-            {(['glm-4.7-flash', 'qwen-3-235b', 'gpt-oss-120b', 'mistral'] as const).map(m => (
+            {(['glm-4.7-flash', 'qwen-3-235b', 'gpt-oss-120b', 'deepseek-chat', 'mistral'] as const).map(m => (
               <button 
                 key={m}
                 onClick={() => setModel(m)}
