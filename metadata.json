@@ -1,0 +1,6 @@
+{
+  "name": "LifeHub - Vietnam Super App",
+  "description": "A versatile hub for Vietnamese users including debt management, AI food suggestions, weather, gold prices, and utility links.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": []
+}

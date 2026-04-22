@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Personalized user information for form automation.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "bank": { "type": "string" },
+        "account": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "bank", "account"]
+    },
+    "Debt": {
+      "title": "Debt Entry",
+      "description": "Financial record of loans given or received.",
+      "type": "object",
+      "properties": {
+        "person": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["cho_vay", "di_vay"] },
+        "note": { "type": "string" },
+        "date": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["person", "amount", "type", "userId"]
+    },
+    "QRCard": {
+      "title": "Bank QR Code",
+      "description": "Stored bank account QR image and metadata.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "image": { "type": "string" },
+        "number": { "type": "string" },
+        "holder": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "image", "userId"]
+    }
+  },
+  "firestore": {
+    "users/{userId}/profile/main": {
+      "schema": "UserProfile",
+      "description": "Private profile for the user."
+    },
+    "users/{userId}/debts/{debtId}": {
+      "schema": "Debt",
+      "description": "Collection of debts belonging to a specific user."
+    },
+    "users/{userId}/qrs/{qrId}": {
+      "schema": "QRCard",
+      "description": "Collection of QR cards belonging to a specific user."
+    }
+  }
+}
