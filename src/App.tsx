@@ -94,6 +94,298 @@ function handleFirestoreError(error: any, operation: FirestoreErrorInfo['operati
   throw JSON.stringify(errorInfo);
 }
 
+// --- Translations ---
+const translations = {
+  vi: {
+    nav_home: 'Trang chủ',
+    nav_bank: 'Bank & Nợ',
+    nav_food: 'Gợi ý món ăn',
+    nav_weather: 'Thời tiết',
+    nav_gold: 'Giá vàng',
+    nav_gas: 'Giá xăng',
+    nav_download: 'Tải video',
+    nav_powercut: 'Lịch cúp điện',
+    nav_profile: 'Cá nhân',
+    hub_title: 'LifeHub v2.0',
+    hub_desc: 'Trung tâm tiện ích đánh bóng cho hiệu quả hiện đại.',
+    login_google: 'Đăng nhập Google',
+    logout: 'Đăng xuất',
+    cloud_disabled: 'Lưu trữ đám mây chưa bật',
+    toolbox: 'Hộp công cụ',
+    auth_required: 'Yêu cầu đăng nhập',
+    auth_desc_bank: 'Bạn cần đăng nhập để quản lý nợ và mã QR an toàn trên đám mây.',
+    auth_desc_profile: 'Cá nhân hóa trải nghiệm và lưu trữ an toàn.',
+    login_now: 'Đăng nhập ngay',
+    tab_debt: 'Quản lý nợ',
+    tab_qr: 'QR Ngân hàng',
+    add_note: 'Thêm ghi chú',
+    person_name: 'Tên người',
+    amount: 'Số tiền (VNĐ)',
+    type_lend: 'Cho vay',
+    type_borrow: 'Đi vay',
+    note_extra: 'Ghi chú thêm',
+    add_data: 'Thêm dữ liệu',
+    registry_empty: 'Danh sách trống',
+    no_metadata: 'Không có dữ liệu',
+    add_qr: 'Thêm mã QR',
+    quick_import: 'Nhập nhanh',
+    pick_library: 'Chọn từ thư viện',
+    supported_formats: '(Hỗ trợ PNG, JPG)',
+    or_manual: 'Hoặc thủ công',
+    bank_institution: 'Ngân hàng',
+    qr_url: 'Đường dẫn ảnh QR',
+    acc_id: 'Số tài khoản',
+    id_holder: 'Chủ tài khoản',
+    establish_qr: 'Tạo mã QR',
+    no_crypto: 'Chưa có mã QR nào',
+    id_no: 'STK',
+    bearer: 'Chủ TK',
+    cuisine_title: 'CulinAI Laboratory',
+    cuisine_desc: 'Nhập các nguyên liệu bạn có để AI gợi ý công thức món ăn.',
+    substrate: 'Nguyên liệu: Trứng, Cà chua, Hành lá, Thịt bò...',
+    synthesizing: 'Đang tổng hợp...',
+    generate_recipe: 'Gợi ý món ăn',
+    weather_search: 'Nhập địa điểm (vd: Hà Nội, Quận 1...)',
+    weather_btn: 'Tra cứu',
+    weather_not_found: 'Không tìm thấy địa điểm này.',
+    weather_error: 'Lỗi khi tải dữ liệu thời tiết.',
+    humidity: 'Độ ẩm',
+    wind_velocity: 'Tốc độ gió',
+    forecast: 'Dự báo 5 ngày',
+    aqi_title: 'Chỉ số chất lượng không khí (AQI)',
+    aqi_desc: 'AQI đo tính toàn vẹn của khí quyển. Giá trị càng thấp càng tốt.',
+    realtime_notice: 'Dữ liệu cập nhật từ Open-Meteo API.',
+    financial_assets: 'Tài sản tài chính',
+    value_unit: 'Đơn vị: VNĐ / Lượng',
+    liquid_buy: 'Giá mua',
+    liquid_sell: 'Giá bán',
+    market_notice: 'Thông báo: Dữ liệu mô phỏng, không có giá trị giao dịch.',
+    petrol_index: 'Chỉ số xăng dầu',
+    fuel_desc: 'Bảng giá xăng dầu cục bộ theo thời gian thực.',
+    fuel_class: 'Loại nhiên liệu',
+    zone1: 'Vùng 1 (đ/L)',
+    zone2: 'Vùng 2 (đ/L)',
+    fuel_notice_title: 'Bối cảnh biến động vùng',
+    fuel_notice_desc: 'Vùng 1 gần kho đầu mối. Vùng 2 ở xa hơn nên giá cao hơn khoảng 2%.',
+    asset_acq: 'Tải tài nguyên',
+    asset_desc: 'Nhập liên kết để tải video hoặc tài nguyên.',
+    resource_url: 'Đường dẫn (TikTok, YT, IG...)',
+    fetch: 'Tải về',
+    download_notice: 'Lưu ý: Sử dụng các cổng trung gian để đảm bảo tin cậy.',
+    personalize: 'Cá nhân hóa',
+    personalize_desc: 'Lưu trữ thông tin để tự động điền các biểu mẫu.',
+    full_name: 'Họ và tên',
+    default_bank: 'Ngân hàng mặc định',
+    save_info: 'Lưu thông tin',
+    profile_info_notice: 'Thông tin này sẽ tự động gắn vào mã QR khi bạn tải ảnh lên.',
+    evn_title: 'Kiểm soát hạ tầng EVN',
+    evn_desc: 'Tra cứu lịch cúp điện từ nhà cung cấp dịch vụ.',
+    locality: 'Địa phương: Hà Nội, Sài Gòn, Cần Thơ...',
+    launch_protocol: 'Truy cập lịch cúp điện',
+    grid_report: 'Báo cáo lưới điện',
+    evn_north: 'EVN Miền Bắc',
+    evn_south: 'EVN Miền Nam',
+    domain_capital: 'Khu vực Thủ đô/Miền Bắc',
+    domain_metro: 'Khu vực Thành phố/Miền Nam',
+    ai_food_prompt: (ing: string) => `Nguyên liệu đang có: ${ing}. Hãy gợi ý 3-5 món ăn ngon, kèm theo công thức ngắn gọn và lưu ý khi nấu. Trình bày bằng tiếng Việt, định dạng Markdown rõ ràng.`,
+    ai_food_system: 'Bạn là một đầu bếp chuyên gia người Việt Nam, thân thiện và sáng tạo.',
+    ai_power_prompt: (area: string) => `Khu vực: ${area}. Hãy trả về tên Tỉnh/Thành phố trực thuộc trung ương chuẩn nhất ở Việt Nam cho khu vực này (VD: "Hà Nội" hoặc "Hồ Chí Minh").`,
+    ai_power_system: 'Bạn là chuyên gia địa lý Việt Nam. Trả lời cực kỳ ngắn gọn, chỉ trả tên tỉnh thành.'
+  },
+  en: {
+    nav_home: 'Home',
+    nav_bank: 'Bank & Debt',
+    nav_food: 'AI Food',
+    nav_weather: 'Weather',
+    nav_gold: 'Gold Price',
+    nav_gas: 'Fuel Price',
+    nav_download: 'Downloader',
+    nav_powercut: 'Power Grid',
+    nav_profile: 'Profile',
+    hub_title: 'LifeHub v2.0',
+    hub_desc: 'Polished utility hub for modern efficiency.',
+    login_google: 'Sign in with Google',
+    logout: 'Sign out',
+    cloud_disabled: 'Cloud Storage Disabled',
+    toolbox: 'Toolbox',
+    auth_required: 'Authentication Required',
+    auth_desc_bank: 'You need to sign in to manage debts and QR codes securely in the cloud.',
+    auth_desc_profile: 'Personalize your experience and save securely.',
+    login_now: 'Sign in now',
+    tab_debt: 'Debt Management',
+    tab_qr: 'Bank QR',
+    add_note: 'Add Note',
+    person_name: 'Person Name',
+    amount: 'Amount (VNĐ)',
+    type_lend: 'Lend',
+    type_borrow: 'Borrow',
+    note_extra: 'Extra Note',
+    add_data: 'Add Data',
+    registry_empty: 'Registry Empty',
+    no_metadata: 'No metadata',
+    add_qr: 'Add QR',
+    quick_import: 'Quick Import',
+    pick_library: 'Pick from Library',
+    supported_formats: '(PNG, JPG supported)',
+    or_manual: 'Or Manual',
+    bank_institution: 'Bank Institution',
+    qr_url: 'QR Image URL',
+    acc_id: 'Account ID',
+    id_holder: 'ID Holder',
+    establish_qr: 'Establish QR',
+    no_crypto: 'No cryptographics detected',
+    id_no: 'ID N°',
+    bearer: 'Bearer',
+    cuisine_title: 'CulinAI Laboratory',
+    cuisine_desc: 'Input available substrate for neural recipe synthesis.',
+    substrate: 'Substrate: Eggs, Tomato, Scallions, Minced Beef...',
+    synthesizing: 'Synthesizing...',
+    generate_recipe: 'Generate Recipe',
+    weather_search: 'Enter location (e.g. London, Tokyo...)',
+    weather_btn: 'Search',
+    weather_not_found: 'Location not found.',
+    weather_error: 'Error loading weather data.',
+    humidity: 'Humidity',
+    wind_velocity: 'Wind Velocity',
+    forecast: '5-Day Forecast',
+    aqi_title: 'Air Quality Index (AQI)',
+    aqi_desc: 'AQI measures atmospheric integrity. Lower is better.',
+    realtime_notice: 'Data updated from Open-Meteo API.',
+    financial_assets: 'Financial Assets',
+    value_unit: 'Unit: VNĐ / Tael',
+    liquid_buy: 'Buy Price',
+    liquid_sell: 'Sell Price',
+    market_notice: 'Notice: Simulated data, no trading value.',
+    petrol_index: 'Petrolimex Index',
+    fuel_desc: 'Real-time localized fuel price matrix.',
+    fuel_class: 'Fuel Type',
+    zone1: 'Zone 1 (đ/L)',
+    zone2: 'Zone 2 (đ/L)',
+    fuel_notice_title: 'Regional Variance',
+    fuel_notice_desc: 'Zone 1 is proximal to hubs. Zone 2 is distal, incurring ~2% overhead.',
+    asset_acq: 'Asset Acquisition',
+    asset_desc: 'Input global resource pointer for persistence.',
+    resource_url: 'Resource URL (TikTok, YT, IG...)',
+    fetch: 'Fetch',
+    download_notice: 'Note: Uses curated gateways for reliability.',
+    personalize: 'Personalization',
+    personalize_desc: 'Store information to auto-fill forms.',
+    full_name: 'Full Name',
+    default_bank: 'Default Bank',
+    save_info: 'Save Profile',
+    profile_info_notice: 'This info will be automatically attached to your QR uploads.',
+    evn_title: 'Infrastructure Control',
+    evn_desc: 'Query regional power grid reports.',
+    locality: 'Locality: Hanoi, Saigon, Can Tho...',
+    launch_protocol: 'Launch Protocol',
+    grid_report: 'Grid Report',
+    evn_north: 'EVN North',
+    evn_south: 'EVN South',
+    domain_capital: 'Capital Domain',
+    domain_metro: 'Metropolitan Domain',
+    ai_food_prompt: (ing: string) => `Ingredients: ${ing}. Suggest 3-5 recipes with concise instructions. Present in English, Markdown format.`,
+    ai_food_system: 'You are an expert chef, creative and helpful.',
+    ai_power_prompt: (area: string) => `Area: ${area}. Return the most accurate Province/City name in Vietnam for this area.`,
+    ai_power_system: 'You are a Vietnam geography expert. Respond briefly with just the city name.'
+  },
+  zh: {
+    nav_home: '首页',
+    nav_bank: '银行与债务',
+    nav_food: 'AI 美食',
+    nav_weather: '天气',
+    nav_gold: '黄金价格',
+    nav_gas: '汽油价格',
+    nav_download: '下载器',
+    nav_powercut: '电网状态',
+    nav_profile: '个人中心',
+    hub_title: 'LifeHub v2.0',
+    hub_desc: '现代效率的精美实用中心。',
+    login_google: '谷歌登录',
+    logout: '退出登录',
+    cloud_disabled: '云存储已禁用',
+    toolbox: '工具箱',
+    auth_required: '需要身份验证',
+    auth_desc_bank: '您需要登录才能在云端安全地管理债务和二维码。',
+    auth_desc_profile: '个性化您的体验并安全存储。',
+    login_now: '立即登录',
+    tab_debt: '债务管理',
+    tab_qr: '银行二维码',
+    add_note: '添加备注',
+    person_name: '姓名',
+    amount: '金额 (VNĐ)',
+    type_lend: '借出',
+    type_borrow: '借入',
+    note_extra: '额外备注',
+    add_data: '添加数据',
+    registry_empty: '列表为空',
+    no_metadata: '无数据',
+    add_qr: '添加二维码',
+    quick_import: '快速导入',
+    pick_library: '从相册选择',
+    supported_formats: '(支持 PNG, JPG)',
+    or_manual: '或手动输入',
+    bank_institution: '所属银行',
+    qr_url: '二维码图片链接',
+    acc_id: '账号',
+    id_holder: '持卡人',
+    establish_qr: '创建二维码',
+    no_crypto: '未检测到二维码',
+    id_no: '账号',
+    bearer: '持有人',
+    cuisine_title: 'AI 烹饪实验室',
+    cuisine_desc: '输入现有食材，让 AI 生成菜谱。',
+    substrate: '食材：鸡蛋、西红柿、葱、牛肉...',
+    synthesizing: '正在生成...',
+    generate_recipe: '生成菜谱',
+    weather_search: '输入城市（如：北京、东京、胡志明市...）',
+    weather_btn: '查询',
+    weather_not_found: '未找到该位置。',
+    weather_error: '加载天气数据出错。',
+    humidity: '湿度',
+    wind_velocity: '风速',
+    forecast: '5天预报',
+    aqi_title: '空气质量指数 (AQI)',
+    aqi_desc: 'AQI 测量大气完整性。数值越低越好。',
+    realtime_notice: '数据更新自 Open-Meteo API。',
+    financial_assets: '金融资产',
+    value_unit: '单位：越南盾 / 两',
+    liquid_buy: '买入价',
+    liquid_sell: '卖出价',
+    market_notice: '注意：模拟数据，无交易价值。',
+    petrol_index: '汽油指数',
+    fuel_desc: '实时本地化燃油价格矩阵。',
+    fuel_class: '燃油类型',
+    zone1: '区域 1 (đ/L)',
+    zone2: '区域 2 (đ/L)',
+    fuel_notice_title: '区域差异',
+    fuel_notice_desc: '区域 1 靠近物流中心。区域 2 较远，有约 2% 的额外成本。',
+    asset_acq: '资源获取',
+    asset_desc: '输入链接以保存视频或资源。',
+    resource_url: '资源链接 (TikTok, YT, IG...)',
+    fetch: '获取',
+    download_notice: '注意：使用精心挑选的网关以确保可靠性。',
+    personalize: '个性化',
+    personalize_desc: '存储信息以自动填写表单。',
+    full_name: '姓名',
+    default_bank: '默认银行',
+    save_info: '保存个人资料',
+    profile_info_notice: '此信息将自动附加到您上传的二维码中。',
+    evn_title: '基础设施控制',
+    evn_desc: '查询区域电网报告。',
+    locality: '地区：河内、西贡、芹苴...',
+    launch_protocol: '启动查询',
+    grid_report: '电网报告',
+    evn_north: '北方电力',
+    evn_south: '南方电力',
+    domain_capital: '首都/北方区域',
+    domain_metro: '都市/南方区域',
+    ai_food_prompt: (ing: string) => `现有食材：${ing}。请推荐 3-5 道菜，并附上简短的说明。请用中文呈现，采用 Markdown 格式。`,
+    ai_food_system: '你是一位专业的厨师，富有创意且乐于助人。',
+    ai_power_prompt: (area: string) => `区域：${area}。请返回越南该地区最准确的省/市名称（如 “河内” 或 “胡志明市”）。`,
+    ai_power_system: '你是一位越南地理专家。请简短回答，仅提供城市名称。'
+  }
+};
+
 // --- Types ---
 interface Debt {
   id: string;
@@ -121,11 +413,14 @@ interface UserProfile {
 // --- Components ---
 
 export default function App() {
+  const [lang, setLang] = useState<'vi' | 'en' | 'zh'>('vi');
   const [activeView, setActiveView] = useState('home');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({ name: '', bank: '', account: '' });
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const t = (key: keyof typeof translations.vi): any => translations[lang][key] || translations.vi[key];
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -179,17 +474,29 @@ export default function App() {
       handleFirestoreError(err, 'update', `users/${user.uid}/profile/main`);
     }
   };
+
+  const handleSignIn = async () => {
+    try {
+      await signIn();
+    } catch (error: any) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        console.warn("User closed the sign-in popup.");
+      } else {
+        console.error("Authentication Error:", error);
+      }
+    }
+  };
   
   const views = [
-    { id: 'home', title: 'Trang chủ', icon: <LayoutDashboard size={20} /> },
-    { id: 'bank', title: 'Bank & Nợ', icon: <Wallet size={20} /> },
-    { id: 'food', title: 'Gợi ý món ăn', icon: <Utensils size={20} /> },
-    { id: 'weather', title: 'Thời tiết', icon: <CloudSun size={20} /> },
-    { id: 'gold', title: 'Giá vàng', icon: <Coins size={20} /> },
-    { id: 'gas', title: 'Giá xăng', icon: <Fuel size={20} /> },
-    { id: 'download', title: 'Tải video', icon: <Download size={20} /> },
-    { id: 'powercut', title: 'Lịch cúp điện', icon: <Zap size={20} /> },
-    { id: 'profile', title: 'Cá nhân', icon: <Wand2 size={20} /> },
+    { id: 'home', title: t('nav_home'), icon: <LayoutDashboard size={20} /> },
+    { id: 'bank', title: t('nav_bank'), icon: <Wallet size={20} /> },
+    { id: 'food', title: t('nav_food'), icon: <Utensils size={20} /> },
+    { id: 'weather', title: t('nav_weather'), icon: <CloudSun size={20} /> },
+    { id: 'gold', title: t('nav_gold'), icon: <Coins size={20} /> },
+    { id: 'gas', title: t('nav_gas'), icon: <Fuel size={20} /> },
+    { id: 'download', title: t('nav_download'), icon: <Download size={20} /> },
+    { id: 'powercut', title: t('nav_powercut'), icon: <Zap size={20} /> },
+    { id: 'profile', title: t('nav_profile'), icon: <Wand2 size={20} /> },
   ];
 
   const currentTitle = views.find(v => v.id === activeView)?.title || '';
@@ -215,22 +522,35 @@ export default function App() {
 
       {/* Sidebar */}
       <aside className={`fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r border-slate-100 z-[100] transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-6 border-b border-slate-50">
-          <h1 className="text-2xl font-black font-display cursor-pointer" onClick={() => setActiveView('home')}>
-            <span className="text-brand">Life</span>Hub
-          </h1>
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 ml-1">Open-source Hub</p>
+        <div className="p-6 border-b border-slate-50 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-black font-display cursor-pointer" onClick={() => setActiveView('home')}>
+              <span className="text-brand">Life</span>Hub
+            </h1>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 ml-1">Open-source Hub</p>
+          </div>
+          <div className="flex flex-col gap-1">
+            {(['vi', 'en', 'zh'] as const).map(l => (
+              <button 
+                key={l}
+                onClick={() => setLang(l)}
+                className={`text-[9px] font-black px-1.5 py-0.5 rounded border transition-all ${lang === l ? 'bg-brand text-white border-brand' : 'text-slate-300 border-slate-200 hover:border-brand/30'}`}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
         </div>
         
         <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
           {!user ? (
             <div className="px-4 py-6 mb-4 bg-indigo-50/50 rounded-3xl border border-indigo-100 flex flex-col items-center gap-4">
-              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest text-center">Cloud Storage Disabled</p>
+              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest text-center">{t('cloud_disabled')}</p>
               <button 
-                onClick={signIn}
+                onClick={handleSignIn}
                 className="theme-btn-primary w-full py-3 text-xs flex items-center justify-center gap-2"
               >
-                <LayoutDashboard size={14} /> Đăng nhập Google
+                <LayoutDashboard size={14} /> {t('login_google')}
               </button>
             </div>
           ) : (
@@ -238,12 +558,12 @@ export default function App() {
               <img src={user.photoURL || ''} className="w-10 h-10 rounded-2xl border-2 border-white shadow-sm" alt="Avatar" />
               <div className="overflow-hidden">
                 <p className="text-xs font-black text-slate-800 truncate">{user.displayName}</p>
-                <button onClick={logout} className="text-[10px] font-black text-secondary uppercase tracking-widest hover:underline">Đăng xuất</button>
+                <button onClick={logout} className="text-[10px] font-black text-secondary uppercase tracking-widest hover:underline">{t('logout')}</button>
               </div>
             </div>
           )}
           
-          <p className="px-4 py-2 text-[10px] text-slate-400 uppercase tracking-widest font-black">Toolbox</p>
+          <p className="px-4 py-2 text-[10px] text-slate-400 uppercase tracking-widest font-black">{t('toolbox')}</p>
           {views.map(view => (
             <button
               key={view.id}
@@ -283,30 +603,30 @@ export default function App() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                {activeView === 'home' && <HomeView onNavigate={setActiveView} />}
+                {activeView === 'home' && <HomeView onNavigate={setActiveView} t={t} />}
                 {activeView === 'bank' && (
-                  user ? <BankView profile={profile} user={user} /> : (
+                  user ? <BankView profile={profile} user={user} t={t} lang={lang} /> : (
                     <div className="text-center py-24">
                       <Wallet size={64} className="mx-auto text-slate-200 mb-6" />
-                      <h3 className="text-2xl font-black text-slate-400">Yêu cầu đăng nhập</h3>
-                      <p className="text-slate-400 mb-8">Bạn cần đăng nhập để quản lý nợ và mã QR an toàn trên đám mây.</p>
-                      <button onClick={signIn} className="theme-btn-primary px-8 py-4">Đăng nhập ngay</button>
+                      <h3 className="text-2xl font-black text-slate-400">{t('auth_required')}</h3>
+                      <p className="text-slate-400 mb-8">{t('auth_desc_bank')}</p>
+                      <button onClick={handleSignIn} className="theme-btn-primary px-8 py-4">{t('login_now')}</button>
                     </div>
                   )
                 )}
-                {activeView === 'food' && <FoodView />}
-                {activeView === 'weather' && <WeatherView />}
-                {activeView === 'gold' && <GoldView />}
-                {activeView === 'gas' && <GasView />}
-                {activeView === 'download' && <DownloadView />}
-                {activeView === 'powercut' && <PowerCutView />}
+                {activeView === 'food' && <FoodView t={t} />}
+                {activeView === 'weather' && <WeatherView t={t} />}
+                {activeView === 'gold' && <GoldView t={t} />}
+                {activeView === 'gas' && <GasView t={t} />}
+                {activeView === 'download' && <DownloadView t={t} />}
+                {activeView === 'powercut' && <PowerCutView t={t} />}
                 {activeView === 'profile' && (
-                  user ? <ProfileView profile={profile} onSave={saveProfile} /> : (
+                  user ? <ProfileView profile={profile} onSave={saveProfile} t={t} /> : (
                     <div className="text-center py-24">
                       <Wand2 size={64} className="mx-auto text-slate-200 mb-6" />
-                      <h3 className="text-2xl font-black text-slate-400">Yêu cầu đăng nhập</h3>
-                      <p className="text-slate-400 mb-8">Cá nhân hóa trải nghiệm và lưu trữ an toàn.</p>
-                      <button onClick={signIn} className="theme-btn-primary px-8 py-4">Đăng nhập ngay</button>
+                      <h3 className="text-2xl font-black text-slate-400">{t('auth_required')}</h3>
+                      <p className="text-slate-400 mb-8">{t('auth_desc_profile')}</p>
+                      <button onClick={handleSignIn} className="theme-btn-primary px-8 py-4">{t('login_now')}</button>
                     </div>
                   )
                 )}
@@ -321,24 +641,24 @@ export default function App() {
 
 // --- SUB-VIEWS ---
 
-function HomeView({ onNavigate }: { onNavigate: (v: string) => void }) {
+function HomeView({ onNavigate, t }: { onNavigate: (v: string) => void, t: any }) {
   const cards = [
-    { id: 'bank', title: 'Bank & Nợ', desc: 'Financial health tracker.', color: 'bg-brand/10 text-brand', icon: <Wallet /> },
-    { id: 'food', title: 'Gợi ý món ăn', desc: 'AI-powered recipes.', color: 'bg-secondary/10 text-secondary', icon: <Utensils /> },
-    { id: 'weather', title: 'Thời tiết', desc: 'Atmospheric breakdown.', color: 'bg-sky-500/10 text-sky-500', icon: <CloudSun /> },
-    { id: 'gold', title: 'Giá vàng', desc: 'Market commodity tracking.', color: 'bg-warning/10 text-warning', icon: <Coins /> },
-    { id: 'gas', title: 'Giá xăng', desc: 'Petrolimex price data.', color: 'bg-rose-500/10 text-rose-500', icon: <Fuel /> },
-    { id: 'download', title: 'Tải video', desc: 'Global asset downloader.', color: 'bg-purple-500/10 text-purple-500', icon: <Download /> },
+    { id: 'bank', title: t('nav_bank'), desc: t('nav_bank') + ' ' + t('registry_empty'), color: 'bg-brand/10 text-brand', icon: <Wallet /> },
+    { id: 'food', title: t('nav_food'), desc: t('cuisine_desc'), color: 'bg-secondary/10 text-secondary', icon: <Utensils /> },
+    { id: 'weather', title: t('nav_weather'), desc: t('nav_weather'), color: 'bg-sky-500/10 text-sky-500', icon: <CloudSun /> },
+    { id: 'gold', title: t('nav_gold'), desc: t('financial_assets'), color: 'bg-warning/10 text-warning', icon: <Coins /> },
+    { id: 'gas', title: t('nav_gas'), desc: t('petrol_index'), color: 'bg-rose-500/10 text-rose-500', icon: <Fuel /> },
+    { id: 'download', title: t('nav_download'), desc: t('asset_acq'), color: 'bg-purple-500/10 text-purple-500', icon: <Download /> },
   ];
 
   return (
     <div className="text-center md:text-left">
       <div className="mb-16">
         <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight text-brand mb-4">
-          LifeHub v2.0
+          {t('hub_title')}
         </h1>
         <p className="text-slate-500 text-xl font-medium max-w-2xl">
-          Polished utility hub for modern efficiency. Ready for distribution.
+          {t('hub_desc')}
         </p>
       </div>
 
@@ -363,15 +683,15 @@ function HomeView({ onNavigate }: { onNavigate: (v: string) => void }) {
           <div className="w-12 h-12 flex items-center justify-center rounded-2xl mb-6 bg-warning/10 text-warning transition-transform group-hover:scale-110">
             <Zap />
           </div>
-          <h3 className="text-xl font-bold font-display mb-2">Lịch cúp điện</h3>
-          <p className="text-sm text-slate-400 font-medium">Power integrity check.</p>
+          <h3 className="text-xl font-bold font-display mb-2">{t('nav_powercut')}</h3>
+          <p className="text-sm text-slate-400 font-medium">{t('evn_desc')}</p>
         </button>
       </div>
     </div>
   );
 }
 
-function BankView({ profile, user }: { profile: UserProfile, user: User }) {
+function BankView({ profile, user, t, lang }: { profile: UserProfile, user: User, t: any, lang: string }) {
   const [tab, setTab] = useState<'debts' | 'qr'>('debts');
   const [debts, setDebts] = useState<Debt[]>([]);
   const [qrs, setQrs] = useState<QRCard[]>([]);
@@ -415,7 +735,7 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
         amount: parseFloat(debtForm.amount),
         type: debtForm.type,
         note: debtForm.note,
-        date: new Date().toLocaleDateString('vi-VN'),
+        date: new Date().toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US'),
         userId: user.uid,
         createdAt: serverTimestamp()
       });
@@ -437,7 +757,7 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
     if (!qrForm.name && !qrForm.image) return;
     try {
       await addDoc(collection(db, 'users', user.uid, 'qrs'), {
-        name: qrForm.name || `QR ${qrs.length + 1}`,
+        name: qrForm.name || `${t('tab_qr')} ${qrs.length + 1}`,
         image: qrForm.image,
         number: qrForm.number,
         holder: qrForm.holder,
@@ -459,7 +779,7 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
       const base64String = reader.result as string;
       try {
         await addDoc(collection(db, 'users', user.uid, 'qrs'), {
-          name: profile.bank || `QR ${qrs.length + 1}`,
+          name: profile.bank || `${t('tab_qr')} ${qrs.length + 1}`,
           image: base64String,
           number: profile.account || '',
           holder: profile.name || '',
@@ -490,29 +810,29 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
         <button 
           onClick={() => setTab('debts')}
           className={`px-8 py-3 rounded-[18px] text-sm font-bold transition-all ${tab === 'debts' ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'text-slate-400 hover:text-slate-600'}`}
-        >Quản lý nợ</button>
+        >{t('tab_debt')}</button>
         <button 
           onClick={() => setTab('qr')}
           className={`px-8 py-3 rounded-[18px] text-sm font-bold transition-all ${tab === 'qr' ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'text-slate-400 hover:text-slate-600'}`}
-        >QR Ngân hàng</button>
+        >{t('tab_qr')}</button>
       </div>
 
       {tab === 'debts' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-4">
             <div className="theme-card">
-              <h3 className="font-bold mb-6 flex items-center gap-2 text-brand"><Plus size={18} /> Thêm ghi chú</h3>
+              <h3 className="font-bold mb-6 flex items-center gap-2 text-brand"><Plus size={18} /> {t('add_note')}</h3>
               <div className="space-y-4">
                 <input 
                   className="theme-input" 
-                  placeholder="Tên người"
+                  placeholder={t('person_name')}
                   value={debtForm.person}
                   onChange={e => setDebtForm({...debtForm, person: e.target.value})}
                 />
                 <input 
                   className="theme-input" 
                   type="number"
-                  placeholder="Số tiền (VNĐ)"
+                  placeholder={t('amount')}
                   value={debtForm.amount}
                   onChange={e => setDebtForm({...debtForm, amount: e.target.value})}
                 />
@@ -521,19 +841,19 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
                   value={debtForm.type}
                   onChange={e => setDebtForm({...debtForm, type: e.target.value as any})}
                 >
-                  <option value="cho_vay">Cho vay</option>
-                  <option value="di_vay">Đi vay</option>
+                  <option value="cho_vay">{t('type_lend')}</option>
+                  <option value="di_vay">{t('type_borrow')}</option>
                 </select>
                 <input 
                   className="theme-input" 
-                  placeholder="Ghi chú thêm"
+                  placeholder={t('note_extra')}
                   value={debtForm.note}
                   onChange={e => setDebtForm({...debtForm, note: e.target.value})}
                 />
                 <button 
                   onClick={addDebt}
                   className="theme-btn-primary w-full"
-                >Thêm dữ liệu</button>
+                >{t('add_data')}</button>
               </div>
             </div>
             
@@ -542,16 +862,16 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-slate-500">Asset Velocity:</span>
-                  <span className="text-brand font-black">{totalChoVay.toLocaleString('vi-VN')} đ</span>
+                  <span className="text-brand font-black">{totalChoVay.toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US')} đ</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-slate-500">Debt Pressure:</span>
-                  <span className="text-secondary font-black">{totalDiVay.toLocaleString('vi-VN')} đ</span>
+                  <span className="text-secondary font-black">{totalDiVay.toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US')} đ</span>
                 </div>
                 <div className="pt-4 border-t border-slate-50 flex justify-between items-center">
                   <span className="text-sm font-black uppercase tracking-tighter">Net Capital:</span>
                   <span className={`text-xl font-black ${(totalChoVay - totalDiVay) >= 0 ? 'text-accent' : 'text-secondary'}`}>
-                    {(totalChoVay - totalDiVay).toLocaleString('vi-VN')} đ
+                    {(totalChoVay - totalDiVay).toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US')} đ
                   </span>
                 </div>
               </div>
@@ -563,7 +883,7 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
               {debts.length === 0 ? (
                 <div className="text-center py-24 bg-white/50 rounded-[32px] border border-dashed border-slate-200">
                   <Wallet size={48} className="mx-auto text-slate-200 mb-6" />
-                  <p className="text-slate-400 font-bold">Registry Empty</p>
+                  <p className="text-slate-400 font-bold">{t('registry_empty')}</p>
                 </div>
               ) : (
                 debts.map(debt => (
@@ -577,12 +897,12 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
                           <h4 className="font-black text-lg text-slate-800">{debt.person}</h4>
                           <span className="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-black text-slate-400 uppercase tracking-tighter">{debt.date}</span>
                         </div>
-                        <p className="text-sm font-medium text-slate-400 mt-1">{debt.note || 'No metadata'}</p>
+                        <p className="text-sm font-medium text-slate-400 mt-1">{debt.note || t('no_metadata')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-6">
                       <div className={`text-xl font-black ${(debt.type === 'cho_vay' || debt.type as any === 'cho_vay') ? 'text-brand' : 'text-secondary'}`}>
-                        {debt.type === 'cho_vay' ? '+' : '-'}{debt.amount.toLocaleString('vi-VN')}
+                        {debt.type === 'cho_vay' ? '+' : '-'}{debt.amount.toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US')}
                       </div>
                       <button 
                         onClick={() => deleteDebt(debt.id)}
@@ -601,15 +921,15 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
              <div className="theme-card bg-indigo-50/20 border-indigo-100/50">
-              <h3 className="text-sm font-black mb-6 flex items-center gap-2 text-slate-800 uppercase tracking-widest"><Plus size={18} className="text-brand" /> Add QR Identity</h3>
+              <h3 className="text-sm font-black mb-6 flex items-center gap-2 text-slate-800 uppercase tracking-widest"><Plus size={18} className="text-brand" /> {t('add_qr')}</h3>
               
               {/* Direct Upload Section */}
               <div className="mb-8">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Quick Import</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t('quick_import')}</label>
                 <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-indigo-200 rounded-[32px] bg-white hover:bg-brand/5 hover:border-brand cursor-pointer transition-all group">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <CloudSun className="text-indigo-200 group-hover:text-brand mb-2" size={32} />
-                    <p className="text-[10px] font-black text-slate-400 group-hover:text-brand text-center px-4">Pick from Library<br/>(PNG, JPG supported)</p>
+                    <p className="text-[10px] font-black text-slate-400 group-hover:text-brand text-center px-4">{t('pick_library')}<br/>{t('supported_formats')}</p>
                   </div>
                   <input type="file" className="hidden" accept=".png,.jpg,.jpeg,.png" onChange={handleFileUpload} />
                 </label>
@@ -617,38 +937,38 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
 
               <div className="relative mb-8 text-center px-4">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-                <span className="relative bg-[#fdfdfd] px-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">Or Manual</span>
+                <span className="relative bg-[#fdfdfd] px-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">{t('or_manual')}</span>
               </div>
 
               <div className="space-y-4">
                 <input 
                   className="theme-input w-full text-sm" 
-                  placeholder="Bank Institution"
+                  placeholder={t('bank_institution')}
                   value={qrForm.name}
                   onChange={e => setQrForm({...qrForm, name: e.target.value})}
                 />
                 <input 
                   className="theme-input w-full text-sm" 
-                  placeholder="QR Image Pointer (URL)"
+                  placeholder={t('qr_url')}
                   value={qrForm.image}
                   onChange={e => setQrForm({...qrForm, image: e.target.value})}
                 />
                 <input 
                   className="theme-input w-full text-sm font-mono" 
-                  placeholder="Account Identifier"
+                  placeholder={t('acc_id')}
                   value={qrForm.number}
                   onChange={e => setQrForm({...qrForm, number: e.target.value})}
                 />
                 <input 
                   className="theme-input w-full text-sm uppercase" 
-                  placeholder="Identity Holder"
+                  placeholder={t('id_holder')}
                   value={qrForm.holder}
                   onChange={e => setQrForm({...qrForm, holder: e.target.value})}
                 />
                 <button 
                   onClick={addQR}
                   className="theme-btn-primary w-full py-4 mt-2"
-                >Establish QR</button>
+                >{t('establish_qr')}</button>
               </div>
             </div>
           </div>
@@ -658,7 +978,7 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
                   <div className="w-20 h-20 bg-slate-50 text-slate-200 rounded-[24px] flex items-center justify-center mb-6">
                     <QrCode size={40} />
                   </div>
-                  <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">No cryptographics detected</p>
+                  <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">{t('no_crypto')}</p>
                </div>
             ) : (
               qrs.map(qr => (
@@ -685,11 +1005,11 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
                   
                   <div className="space-y-2 w-full pt-4 border-t border-slate-50">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">ID N°</span>
+                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t('id_no')}</span>
                       <span className="font-black text-brand text-sm font-mono tracking-tight">{qr.number}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Bearer</span>
+                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t('bearer')}</span>
                       <span className="font-black text-slate-800 text-xs uppercase tracking-tight">{qr.holder}</span>
                     </div>
                   </div>
@@ -703,7 +1023,7 @@ function BankView({ profile, user }: { profile: UserProfile, user: User }) {
   );
 }
 
-function FoodView() {
+function FoodView({ t }: { t: any }) {
   const [ingredients, setIngredients] = useState('');
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
@@ -715,15 +1035,15 @@ function FoodView() {
     try {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Nguyên liệu đang có: ${ingredients}. Hãy gợi ý 3-5 món ăn ngon, kèm theo công thức ngắn gọn và lưu ý khi nấu. Trình bày bằng tiếng Việt, định dạng Markdown rõ ràng.`,
+        contents: t('ai_food_prompt')(ingredients),
         config: {
-          systemInstruction: "Bạn là một đầu bếp chuyên gia người Việt Nam, thân thiện và sáng tạo."
+          systemInstruction: t('ai_food_system')
         }
       });
-      setResult(response.text || "Không có phản hồi từ AI.");
+      setResult(response.text || t('no_metadata'));
     } catch (e) {
       console.error("AI Error:", e);
-      setResult("⚠️ Lỗi kết nối AI. Vui lòng kiểm tra lại cấu hình API key.");
+      setResult("⚠️ " + t('weather_error'));
     } finally {
       setLoading(false);
     }
@@ -735,13 +1055,13 @@ function FoodView() {
         <div className="absolute top-0 right-0 p-8 text-brand/5 pointer-events-none text-[120px]">
           <Utensils />
         </div>
-        <h3 className="text-3xl font-black mb-4 font-display text-brand">CulinAI Laboratory</h3>
+        <h3 className="text-3xl font-black mb-4 font-display text-brand">{t('cuisine_title')}</h3>
         <p className="text-slate-500 text-sm mb-8 leading-loose font-medium">
-          Input available substrate for neural recipe synthesis. Let open-source intelligence curate your next gourmet experience.
+          {t('cuisine_desc')}
         </p>
         <textarea 
           className="theme-input min-h-[160px] mb-6 font-medium text-base leading-relaxed"
-          placeholder="Substrate: Eggs, Tomato, Scalions, Minced Beef..."
+          placeholder={t('substrate')}
           value={ingredients}
           onChange={e => setIngredients(e.target.value)}
         />
@@ -751,7 +1071,7 @@ function FoodView() {
           className="theme-btn-primary w-full flex items-center justify-center gap-3 disabled:opacity-50"
         >
           {loading ? <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" /> : <Wand2 size={22} />}
-          {loading ? 'Synthesizing...' : 'Generate Recipe'}
+          {loading ? t('synthesizing') : t('generate_recipe')}
         </button>
       </div>
 
@@ -764,7 +1084,7 @@ function FoodView() {
   );
 }
 
-function WeatherView() {
+function WeatherView({ t }: { t: any }) {
   const [addr, setAddr] = useState('');
   const [weather, setWeather] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -779,7 +1099,7 @@ function WeatherView() {
       const { data: geoData } = await axios.get(geoUrl);
       
       if (!geoData.results || geoData.results.length === 0) {
-        alert("Không tìm thấy địa điểm này.");
+        alert(t('weather_not_found'));
         return;
       }
 
@@ -801,36 +1121,38 @@ function WeatherView() {
         location: { name, country }
       });
     } catch (e) {
-      alert("Lỗi khi tải dữ liệu thời tiết.");
+      alert(t('weather_error'));
     } finally {
       setLoading(false);
     }
   };
 
   const getWeatherVisuals = (code: number) => {
-    if (code === 0) return { label: 'Trời quang', color: 'text-yellow-400' };
-    if (code >= 1 && code <= 3) return { label: 'Ít mây', color: 'text-gray-400' };
-    if (code >= 45 && code <= 48) return { label: 'Sương mù', color: 'text-gray-300' };
-    if (code >= 51 && code <= 67) return { label: 'Mưa nhỏ', color: 'text-blue-400' };
-    if (code >= 71 && code <= 77) return { label: 'Tuyết', color: 'text-white' };
-    if (code >= 80 && code <= 99) return { label: 'Mưa rào', color: 'text-blue-600' };
-    return { label: 'Nhiều mây', color: 'text-gray-500' };
+    if (code === 0) return { label: t('vi' === 'vi' ? 'Trời quang' : 'Clear'), color: 'text-yellow-400' };
+    if (code >= 1 && code <= 3) return { label: t('vi' === 'vi' ? 'Ít mây' : 'Few clouds'), color: 'text-gray-400' };
+    if (code >= 45 && code <= 48) return { label: t('vi' === 'vi' ? 'Sương mù' : 'Fog'), color: 'text-gray-300' };
+    if (code >= 51 && code <= 67) return { label: t('vi' === 'vi' ? 'Mưa nhỏ' : 'Drizzle'), color: 'text-blue-400' };
+    if (code >= 71 && code <= 77) return { label: t('vi' === 'vi' ? 'Tuyết' : 'Snow'), color: 'text-white' };
+    if (code >= 80 && code <= 99) return { label: t('vi' === 'vi' ? 'Mưa rào' : 'Showers'), color: 'text-blue-600' };
+    return { label: t('vi' === 'vi' ? 'Nhiều mây' : 'Overcast'), color: 'text-gray-500' };
   };
 
-  const getAQIInfo = (val: number) => {
-    if (val <= 50) return { label: 'Tốt', color: 'bg-green-500', text: 'text-green-500' };
-    if (val <= 100) return { label: 'Trung bình', color: 'bg-yellow-500', text: 'text-yellow-500' };
-    if (val <= 150) return { label: 'Kém', color: 'bg-orange-500', text: 'text-orange-500' };
-    if (val <= 200) return { label: 'Xấu', color: 'bg-red-500', text: 'text-red-500' };
-    return { label: 'Rất xấu', color: 'bg-purple-500', text: 'text-purple-500' };
-  };
+  const aqiMap = [
+    { label: t('vi' === 'vi' ? 'Tốt' : 'Good'), color: 'bg-green-500', text: 'text-green-500', max: 50 },
+    { label: t('vi' === 'vi' ? 'Trung bình' : 'Moderate'), color: 'bg-yellow-500', text: 'text-yellow-500', max: 100 },
+    { label: t('vi' === 'vi' ? 'Kém' : 'Unhealthy for sensitive'), color: 'bg-orange-500', text: 'text-orange-500', max: 150 },
+    { label: t('vi' === 'vi' ? 'Xấu' : 'Unhealthy'), color: 'bg-red-500', text: 'text-red-500', max: 200 },
+    { label: t('vi' === 'vi' ? 'Rất xấu' : 'Very Unhealthy'), color: 'bg-purple-500', text: 'text-purple-500', max: 999 },
+  ];
+
+  const getAQIInfo = (val: number) => aqiMap.find(m => val <= m.max) || aqiMap[4];
 
   return (
     <div className="space-y-8">
       <div className="max-w-xl mx-auto flex gap-3">
         <input 
           className="theme-input flex-1"
-          placeholder="Enter location (e.g. Hanoi, District 1...)"
+          placeholder={t('weather_search')}
           value={addr}
           onChange={e => setAddr(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && searchWeather()}
@@ -841,7 +1163,7 @@ function WeatherView() {
           className="theme-btn-primary min-w-[140px] flex items-center justify-center gap-2"
         >
           {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Search size={20} />}
-          Tra cứu
+          {t('weather_btn')}
         </button>
       </div>
 
@@ -861,24 +1183,24 @@ function WeatherView() {
                   <div className="bg-white p-6 rounded-[24px] border border-slate-50 shadow-sm">
                     <Droplets size={24} className="mx-auto text-sky-500 mb-3" />
                     <div className="text-2xl font-black text-slate-800">{weather.current.relative_humidity_2m}%</div>
-                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Humidity</div>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t('humidity')}</div>
                   </div>
                   <div className="bg-white p-6 rounded-[24px] border border-slate-50 shadow-sm">
                     <Wind size={24} className="mx-auto text-accent mb-3" />
                     <div className="text-2xl font-black text-slate-800">{Math.round(weather.current.wind_speed_10m)} <span className="text-sm">km/h</span></div>
-                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Wind Velocity</div>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t('wind_velocity')}</div>
                   </div>
                </div>
             </div>
 
             <div className="theme-card">
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">5-Day Atmospheric Projection</h3>
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">{t('forecast')}</h3>
               <div className="grid grid-cols-5 gap-3">
-                {weather.daily.time.slice(0, 5).map((t: string, i: number) => {
-                  const date = new Date(t);
+                {weather.daily.time.slice(0, 5).map((tValue: string, i: number) => {
+                  const date = new Date(tValue);
                   const visual = getWeatherVisuals(weather.daily.weather_code[i]);
                   return (
-                    <div key={t} className="text-center p-5 bg-slate-50 rounded-[24px] border border-slate-100/50">
+                    <div key={tValue} className="text-center p-5 bg-slate-50 rounded-[24px] border border-slate-100/50">
                       <div className="text-[10px] font-bold text-slate-400 mb-3">{date.getDate()}/{date.getMonth() + 1}</div>
                       <div className={`text-2xl font-black mb-1 ${visual.color}`}>{Math.round(weather.daily.temperature_2m_max[i])}°</div>
                       <div className="text-[10px] font-black text-slate-300">{Math.round(weather.daily.temperature_2m_min[i])}°</div>
@@ -891,7 +1213,7 @@ function WeatherView() {
 
           <div className="lg:col-span-1 space-y-8">
             <div className={`theme-card text-center bg-white`}>
-               <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">Air Quality Index (AQI)</h3>
+               <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">{t('aqi_title')}</h3>
                <div className={`text-8xl font-black font-display tracking-tighter mb-4 ${getAQIInfo(weather.aqi).text}`}>{weather.aqi}</div>
                <div className={`inline-block px-6 py-2 rounded-full text-xs font-black text-white mb-10 shadow-lg ${getAQIInfo(weather.aqi).color}`}>
                 {getAQIInfo(weather.aqi).label.toUpperCase()}
@@ -904,14 +1226,14 @@ function WeatherView() {
                   />
                </div>
                <p className="text-[10px] text-slate-400 font-bold mt-8 leading-relaxed px-4">
-                AQI measures atmospheric integrity. Lower values represent optimal breathable substrates.
+                {t('aqi_desc')}
                </p>
             </div>
 
             <div className="p-8 bg-indigo-50/50 rounded-[32px] border border-indigo-100/50">
                <div className="flex items-center gap-4 text-xs font-bold italic text-indigo-400">
                 <Info size={18} className="shrink-0" />
-                Dữ liệu được cập nhật từ Open-Meteo API (Thời gian thực).
+                {t('realtime_notice')}
                </div>
             </div>
           </div>
@@ -921,7 +1243,7 @@ function WeatherView() {
   );
 }
 
-function GoldView() {
+function GoldView({ t }: { t: any }) {
   const [data, setData] = useState([
     { name: 'SJC 9999', buy: 89000000, sell: 92000000, change: 0.5 },
     { name: 'PNJ 24K', buy: 74200000, sell: 75500000, change: -0.2 },
@@ -942,8 +1264,8 @@ function GoldView() {
     <div className="max-w-3xl mx-auto space-y-8">
       <div className="flex justify-between items-center bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
         <div>
-          <h3 className="text-3xl font-black font-display text-brand tracking-tight">Financial Assets</h3>
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Value unit: VNĐ / Lượng</p>
+          <h3 className="text-3xl font-black font-display text-brand tracking-tight">{t('financial_assets')}</h3>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{t('value_unit')}</p>
         </div>
         <button onClick={refresh} className="p-4 bg-slate-50 text-brand rounded-[20px] hover:bg-brand hover:text-white transition-all shadow-sm">
           <RotateCcw size={24} />
@@ -964,23 +1286,23 @@ function GoldView() {
             </div>
             <div className="flex gap-12 sm:gap-20">
               <div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-2">Liquid Buy</div>
+                <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-2">{t('liquid_buy')}</div>
                 <div className="text-2xl font-black font-display text-slate-800 tracking-tighter">{Math.round(item.buy / 1000000).toFixed(2)} <span className="text-sm font-bold text-slate-300">Tr</span></div>
               </div>
               <div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-2">Liquid Sell</div>
+                <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-2">{t('liquid_sell')}</div>
                 <div className="text-2xl font-black font-display text-brand tracking-tighter">{Math.round(item.sell / 1000000).toFixed(2)} <span className="text-sm font-bold text-indigo-200">Tr</span></div>
               </div>
             </div>
           </div>
         ))}
       </div>
-      <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest italic">Advisory notice: Simulation only. No real market intent.</p>
+      <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest italic">{t('market_notice')}</p>
     </div>
   );
 }
 
-function GasView() {
+function GasView({ t }: { t: any }) {
   const products = [
     { name: 'Xăng RON 95-XI', price: 23150, region1: 23150, region2: 23610 },
     { name: 'Xăng E5 RON 92-II', price: 22100, region1: 22100, region2: 22540 },
@@ -994,16 +1316,16 @@ function GasView() {
           <div className="absolute top-0 right-0 p-8 text-brand/5 pointer-events-none text-[120px] rotate-12">
              <Fuel />
           </div>
-          <h3 className="text-3xl font-black mb-2 font-display text-brand tracking-tight">Petrolimex Index</h3>
-          <p className="text-slate-500 mb-10 font-medium">Real-time localized fuel price matrix.</p>
+          <h3 className="text-3xl font-black mb-2 font-display text-brand tracking-tight">{t('petrol_index')}</h3>
+          <p className="text-slate-500 mb-10 font-medium">{t('fuel_desc')}</p>
           
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-slate-100">
-                  <th className="pb-6 text-[10px] uppercase tracking-widest text-slate-400 font-black">Substrate Classification</th>
-                  <th className="pb-6 text-[10px] uppercase tracking-widest text-slate-400 font-black text-right">Zone 1 (đ/L)</th>
-                  <th className="pb-6 text-[10px] uppercase tracking-widest text-slate-400 font-black text-right">Zone 2 (đ/L)</th>
+                  <th className="pb-6 text-[10px] uppercase tracking-widest text-slate-400 font-black">{t('fuel_class')}</th>
+                  <th className="pb-6 text-[10px] uppercase tracking-widest text-slate-400 font-black text-right">{t('zone1')}</th>
+                  <th className="pb-6 text-[10px] uppercase tracking-widest text-slate-400 font-black text-right">{t('zone2')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -1022,9 +1344,9 @@ function GasView() {
        <div className="theme-card flex items-start gap-6 bg-sky-50 shadow-none border-sky-100">
           <Info className="text-sky-500 shrink-0 mt-1" size={24} />
           <div>
-            <h4 className="text-sm font-black text-sky-800 uppercase tracking-widest mb-2">Regional Variance Context</h4>
+            <h4 className="text-sm font-black text-sky-800 uppercase tracking-widest mb-2">{t('fuel_notice_title')}</h4>
             <p className="text-[13px] text-sky-700/70 leading-relaxed font-medium">
-              Zone 1 comprises nodes proximal to logistical hubs. Zone 2 represents distal perimeters requiring secondary transport, incurring a standard ~2% volatility overhead.
+              {t('fuel_notice_desc')}
             </p>
           </div>
        </div>
@@ -1032,7 +1354,7 @@ function GasView() {
   );
 }
 
-function DownloadView() {
+function DownloadView({ t }: { t: any }) {
   const [url, setUrl] = useState('');
   
   const platforms = [
@@ -1045,16 +1367,16 @@ function DownloadView() {
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="theme-card text-center bg-indigo-50/30 border-indigo-100">
-        <h3 className="text-3xl font-black mb-4 font-display text-brand">Asset Acquisition</h3>
-        <p className="text-slate-500 text-sm mb-8 font-medium">Input global resource pointer for local environment persistence.</p>
+        <h3 className="text-3xl font-black mb-4 font-display text-brand">{t('asset_acq')}</h3>
+        <p className="text-slate-500 text-sm mb-8 font-medium">{t('asset_desc')}</p>
         <div className="flex gap-3">
           <input 
             className="theme-input flex-1"
-            placeholder="Resource URL (TikTok, YT, IG...)"
+            placeholder={t('resource_url')}
             value={url}
             onChange={e => setUrl(e.target.value)}
           />
-          <button className="theme-btn-primary min-w-[120px]">Fetch</button>
+          <button className="theme-btn-primary min-w-[120px]">{t('fetch')}</button>
         </div>
       </div>
 
@@ -1081,14 +1403,14 @@ function DownloadView() {
       
       <div className="p-8 bg-indigo-50 rounded-[32px] border border-indigo-100/50 text-center">
         <p className="text-xs text-brand font-black italic uppercase tracking-tighter">
-          Integration Notice: Due to platform API entropy, we utilize curated gateways for maximum reliability.
+          {t('download_notice')}
         </p>
       </div>
     </div>
   );
 }
 
-function ProfileView({ profile, onSave }: { profile: UserProfile, onSave: (p: UserProfile) => void }) {
+function ProfileView({ profile, onSave, t }: { profile: UserProfile, onSave: (p: UserProfile) => void, t: any }) {
   const [form, setForm] = useState(profile);
 
   return (
@@ -1097,14 +1419,14 @@ function ProfileView({ profile, onSave }: { profile: UserProfile, onSave: (p: Us
         <div className="w-24 h-24 bg-brand/10 text-brand rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-brand/5">
           <Wand2 size={40} />
         </div>
-        <h3 className="text-3xl font-black font-display text-brand tracking-tight">Cá nhân hóa</h3>
-        <p className="text-slate-500 font-medium mt-2">Lưu trữ thông tin để tự động điền các biểu mẫu.</p>
+        <h3 className="text-3xl font-black font-display text-brand tracking-tight">{t('personalize')}</h3>
+        <p className="text-slate-500 font-medium mt-2">{t('personalize_desc')}</p>
       </div>
 
       <div className="theme-card space-y-6">
         <div className="space-y-4">
           <div>
-            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 ml-1">Họ và tên</label>
+            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 ml-1">{t('full_name')}</label>
             <input 
               className="theme-input w-full"
               placeholder="NGUYEN VAN A"
@@ -1113,7 +1435,7 @@ function ProfileView({ profile, onSave }: { profile: UserProfile, onSave: (p: Us
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 ml-1">Ngân hàng mặc định</label>
+            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 ml-1">{t('default_bank')}</label>
             <input 
               className="theme-input w-full"
               placeholder="MB Bank, VCB..."
@@ -1122,7 +1444,7 @@ function ProfileView({ profile, onSave }: { profile: UserProfile, onSave: (p: Us
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 ml-1">Số tài khoản</label>
+            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 ml-1">{t('acc_id')}</label>
             <input 
               className="theme-input w-full font-mono"
               placeholder="0123456789"
@@ -1136,21 +1458,21 @@ function ProfileView({ profile, onSave }: { profile: UserProfile, onSave: (p: Us
           onClick={() => onSave(form)}
           className="theme-btn-primary w-full py-4 mt-4"
         >
-          Lưu thông tin
+          {t('save_info')}
         </button>
       </div>
 
       <div className="p-8 bg-sky-50 rounded-[32px] border border-sky-100/50 flex gap-4 items-start shadow-sm">
         <Info className="text-sky-500 shrink-0 mt-1" size={20} />
         <p className="text-sm text-sky-700/70 font-medium leading-relaxed">
-          Thông tin này sẽ được sử dụng để tự động gắn vào các thẻ QR khi bạn tải ảnh lên từ thư viện, giúp tiết kiệm thời gian nhập liệu.
+          {t('profile_info_notice')}
         </p>
       </div>
     </div>
   );
 }
 
-function PowerCutView() {
+function PowerCutView({ t }: { t: any }) {
   const [area, setArea] = useState('');
   const [city, setCity] = useState('');
   const [loading, setLoading] = useState(false);
@@ -1161,9 +1483,9 @@ function PowerCutView() {
     try {
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Khu vực: ${area}. Hãy trả về tên Tỉnh/Thành phố trực thuộc trung ương chuẩn nhất ở Việt Nam cho khu vực này (VD: "Hà Nội" hoặc "Hồ Chí Minh").`,
+        contents: t('ai_power_prompt')(area),
         config: {
-          systemInstruction: "Bạn là chuyên gia địa lý Việt Nam. Trả lời cực kỳ ngắn gọn, chỉ trả tên tỉnh thành."
+          systemInstruction: t('ai_power_system')
         }
       });
       setCity(response.text?.trim() || area);
@@ -1180,18 +1502,18 @@ function PowerCutView() {
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="theme-card">
-        <h3 className="text-3xl font-black mb-4 font-display text-brand">EVN Infrastructure Control</h3>
-        <p className="text-slate-500 text-sm mb-8 font-medium">Query regional power integrity reports directly from utility providers.</p>
+        <h3 className="text-3xl font-black mb-4 font-display text-brand">{t('evn_title')}</h3>
+        <p className="text-slate-500 text-sm mb-8 font-medium">{t('evn_desc')}</p>
         <div className="flex gap-3 mb-10">
           <input 
             className="theme-input flex-1"
-            placeholder="Locality: Hanoi, Saigon, Can Tho..."
+            placeholder={t('locality')}
             value={area}
             onChange={e => setArea(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
           />
           <button onClick={handleSearch} disabled={loading} className="theme-btn-primary min-w-[140px] flex items-center justify-center gap-2 bg-warning shadow-warning/20">
-            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Tra cứu'}
+            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : t('weather_btn')}
           </button>
         </div>
 
@@ -1200,9 +1522,9 @@ function PowerCutView() {
              <div className="w-20 h-20 bg-white text-warning rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-indigo-100">
                 <Zap size={40} />
              </div>
-             <h4 className="text-2xl font-black text-slate-800 mb-2">{city} Grid Report</h4>
+             <h4 className="text-2xl font-black text-slate-800 mb-2">{city} {t('grid_report')}</h4>
              <p className="text-slate-500 text-sm mb-10 leading-relaxed font-medium">
-              Data synchronized with regional EVN distribution clusters. Finalizing integrity check...
+              {t('aqi_desc')}
              </p>
              <a 
               href={directLink}
@@ -1210,7 +1532,7 @@ function PowerCutView() {
               rel="noopener noreferrer"
               className="theme-btn-primary bg-slate-800 shadow-slate-200"
              >
-                Launch Protocol for {city} <ExternalLink size={20} className="inline ml-2" />
+                {t('launch_protocol')} {city} <ExternalLink size={20} className="inline ml-2" />
              </a>
           </div>
         )}
@@ -1218,16 +1540,17 @@ function PowerCutView() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="theme-card">
-          <h5 className="font-black text-slate-800 mb-2 flex items-center gap-3"><Zap size={18} className="text-warning" /> EVN North Cluster</h5>
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-4">Capital Domain</p>
+          <h5 className="font-black text-slate-800 mb-2 flex items-center gap-3"><Zap size={18} className="text-warning" /> {t('evn_north')}</h5>
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-4">{t('domain_capital')}</p>
           <a href="https://evnhanoi.vn/search/power-cut" target="_blank" className="text-xs font-black text-brand hover:underline">Access Terminal →</a>
         </div>
         <div className="theme-card">
-          <h5 className="font-black text-slate-800 mb-2 flex items-center gap-3"><Zap size={18} className="text-warning" /> EVN South Cluster</h5>
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-4">Metropolitan Domain</p>
+          <h5 className="font-black text-slate-800 mb-2 flex items-center gap-3"><Zap size={18} className="text-warning" /> {t('evn_south')}</h5>
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-4">{t('domain_metro')}</p>
           <a href="https://www.evnhcmc.vn/khach-hang/lich-ngung-giam-cung-cap-dien" target="_blank" className="text-xs font-black text-brand hover:underline">Access Terminal →</a>
         </div>
       </div>
     </div>
   );
 }
+
