@@ -80,7 +80,8 @@ async function startServer() {
     try {
       const response = await retryAI(() => 
         axios.post('https://platform.beeknoee.com/api/v1/chat/completions', req.body, {
-          headers: { 'Authorization': `Bearer ${BEEKNOEE_API_KEY}`, 'Content-Type': 'application/json' }
+          headers: { 'Authorization': `Bearer ${BEEKNOEE_API_KEY}`, 'Content-Type': 'application/json' },
+          timeout: 45000 // 45 seconds timeout
         })
       );
       res.json(response.data);
@@ -89,6 +90,9 @@ async function startServer() {
       const data = error.response?.data || { error: error.message };
       if (status === 429) {
         return res.status(429).json({ error: "AI is currently very busy. Please wait a minute and try again." });
+      }
+      if (error.code === 'ECONNABORTED' || status === 524) {
+        return res.status(524).json({ error: "AI Provider timed out. The server is taking too long to respond. Please try again." });
       }
       res.status(status).json(data);
     }
@@ -99,7 +103,8 @@ async function startServer() {
     try {
       const response = await retryAI(() => 
         axios.post('https://api.mistral.ai/v1/chat/completions', req.body, {
-          headers: { 'Authorization': `Bearer ${MISTRAL_API_KEY}`, 'Content-Type': 'application/json' }
+          headers: { 'Authorization': `Bearer ${MISTRAL_API_KEY}`, 'Content-Type': 'application/json' },
+          timeout: 45000 // 45 seconds timeout
         })
       );
       res.json(response.data);
@@ -108,6 +113,9 @@ async function startServer() {
       const data = error.response?.data || { error: error.message };
       if (status === 429) {
         return res.status(429).json({ error: "AI service limit reached. Please switch models or try again shortly." });
+      }
+      if (error.code === 'ECONNABORTED' || status === 524) {
+        return res.status(524).json({ error: "AI Provider timed out. The server is taking too long to respond. Please try again." });
       }
       res.status(status).json(data);
     }

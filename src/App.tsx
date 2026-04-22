@@ -1067,15 +1067,19 @@ function FoodView({ t }: { t: any }) {
   const [ingredients, setIngredients] = useState('');
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
-  const [model, setModel] = useState<'deepseek' | 'mistral'>('deepseek');
+  const [model, setModel] = useState<'glm-4.7-flash' | 'qwen-3-235b' | 'gpt-oss-120b' | 'mistral'>('glm-4.7-flash');
 
   const getSuggestion = async () => {
     if (!ingredients.trim()) return;
     setLoading(true);
     setResult('');
     try {
-      const endpoint = model === 'deepseek' ? '/api/ai/beeknoee' : '/api/ai/mistral';
-      const aiModel = model === 'deepseek' ? 'glm-4.5-flash' : 'mistral-large-2512';
+      const isMistral = model === 'mistral';
+      const endpoint = isMistral ? '/api/ai/mistral' : '/api/ai/beeknoee';
+      const aiModel = isMistral ? 'mistral-large-2512' : ( 
+        model === 'qwen-3-235b' ? 'qwen-3-235b-a22b-instruct-2507' : 
+        model === 'gpt-oss-120b' ? 'openai/gpt-oss-120b' : model
+      );
       const response = await axios.post(endpoint, {
         model: aiModel,
         messages: [
@@ -1091,6 +1095,8 @@ function FoodView({ t }: { t: any }) {
         setResult("⚠️ Unauthorized: Your API key for " + model + " seems invalid or expired.");
       } else if (e.response?.status === 429) {
         setResult("⚠️ " + (e.response?.data?.error || "Rate limit reached. Please wait a moment."));
+      } else if (e.response?.status === 524 || e.code === 'ECONNABORTED') {
+        setResult("⚠️ AI Timeout: Server took too long to respond. The AI might be overloaded, please try again with simpler ingredients.");
       } else {
         setResult("⚠️ " + t('weather_error'));
       }
@@ -1109,14 +1115,14 @@ function FoodView({ t }: { t: any }) {
         
         <div className="mb-6">
           <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('select_model')}</label>
-          <div className="flex gap-2">
-            {(['deepseek', 'mistral'] as const).map(m => (
+          <div className="flex flex-wrap gap-2">
+            {(['glm-4.7-flash', 'qwen-3-235b', 'gpt-oss-120b', 'mistral'] as const).map(m => (
               <button 
                 key={m}
                 onClick={() => setModel(m)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${model === m ? 'bg-brand text-white' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+                className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all ${model === m ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
               >
-                {t(`model_${m}`)}
+                {m.replace(/-/g, ' ')}
               </button>
             ))}
           </div>
