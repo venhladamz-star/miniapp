@@ -455,6 +455,10 @@ export default function App() {
   const t = (key: keyof typeof translations.vi): any => translations[lang][key] || translations.vi[key];
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
@@ -465,6 +469,7 @@ export default function App() {
 
     // Validate connection to Firestore
     const testConnection = async () => {
+      if (!db) return;
       try {
         await getDocFromServer(doc(db, 'test', 'connection'));
       } catch (error) {
@@ -479,7 +484,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !db) return;
     
     const unsub = onSnapshot(doc(db, 'users', user.uid, 'profile', 'main'), (snap) => {
       if (snap.exists()) {
