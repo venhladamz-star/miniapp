@@ -514,12 +514,19 @@ export default function App() {
 
   const handleSignIn = async () => {
     try {
+      if (!auth) {
+        alert("Firebase is not initialized. Please check your config.");
+        return;
+      }
       await signIn();
     } catch (error: any) {
       if (error.code === 'auth/popup-closed-by-user') {
         console.warn("User closed the sign-in popup.");
+      } else if (error.code === 'auth/unauthorized-domain') {
+        alert("Domain Not Authorized: Please add this domain to authorized domains in Firebase Console.");
       } else {
         console.error("Authentication Error:", error);
+        alert(`Login failed: ${error.message}`);
       }
     }
   };
@@ -535,6 +542,14 @@ export default function App() {
     { id: 'search', title: t('nav_search'), icon: <Search size={20} /> },
     { id: 'powercut', title: t('nav_powercut'), icon: <Zap size={20} /> },
     { id: 'profile', title: t('nav_profile'), icon: <Wand2 size={20} /> },
+  ];
+
+  const bottomViews = [
+    { id: 'home', icon: <LayoutDashboard size={22} /> },
+    { id: 'bank', icon: <Wallet size={22} /> },
+    { id: 'food', icon: <Utensils size={22} /> },
+    { id: 'weather', icon: <CloudSun size={22} /> },
+    { id: 'profile', icon: <Wand2 size={22} /> },
   ];
 
   const currentTitle = views.find(v => v.id === activeView)?.title || '';
@@ -618,16 +633,25 @@ export default function App() {
       {/* Main Content */}
       <main className="md:ml-[280px]">
         {/* Header */}
-        <header className="fixed top-0 right-0 left-0 md:left-[280px] h-[64px] bg-bg/80 backdrop-blur-xl border-b border-slate-100 z-50 flex items-center px-6">
+        <header className="fixed top-0 right-0 left-0 md:left-[280px] h-[64px] bg-bg/80 backdrop-blur-xl border-b border-slate-100 z-50 flex items-center px-4 md:px-6">
           <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 -ml-2 text-slate-800 hover:bg-slate-100 rounded-lg">
             <Menu size={24} />
           </button>
-          <div className="ml-4 md:ml-0 bg-indigo-50 text-brand px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+          <div className="ml-4 md:ml-0 bg-indigo-50 text-brand px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest truncate max-w-[120px] md:max-w-none">
             {currentTitle}
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            {!user ? (
+               <button onClick={handleSignIn} className="bg-brand text-white px-3 py-1.5 rounded-xl text-[10px] font-bold md:hidden">
+                 {t('login_google')}
+               </button>
+            ) : (
+               <img src={user.photoURL || ''} className="w-8 h-8 rounded-xl border border-white shadow-sm md:hidden" alt="User" />
+            )}
           </div>
         </header>
 
-        <div className="pt-[84px] px-6 pb-12 max-w-5xl mx-auto">
+        <div className="pt-[84px] px-3 md:px-6 pb-28 md:pb-12 max-w-5xl mx-auto">
           {loading ? (
             <div className="flex items-center justify-center py-24">
               <div className="w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
@@ -674,6 +698,27 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {/* Bottom Navigation for Mobile */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-100 px-2 py-3 z-[100] md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
+        <div className="flex items-center justify-around">
+          {bottomViews.map(view => (
+            <button
+              key={view.id}
+              onClick={() => setActiveView(view.id)}
+              className={`p-3 rounded-2xl transition-all ${activeView === view.id ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'text-slate-400'}`}
+            >
+              {view.icon}
+            </button>
+          ))}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-3 rounded-2xl text-slate-400"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
+      </nav>
     </div>
   );
 }
@@ -693,27 +738,27 @@ function HomeView({ onNavigate, t }: { onNavigate: (v: string) => void, t: any }
 
   return (
     <div className="text-center md:text-left">
-      <div className="mb-16">
-        <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight text-brand mb-4">
+      <div className="mb-10 md:mb-16">
+        <h1 className="text-4xl md:text-7xl font-black font-display tracking-tight text-brand mb-4 leading-[1.1]">
           {t('hub_title')}
         </h1>
-        <p className="text-slate-500 text-xl font-medium max-w-2xl">
+        <p className="text-slate-500 text-lg md:text-xl font-medium max-w-2xl mx-auto md:mx-0">
           {t('hub_desc')}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pb-20">
         {cards.map(card => (
           <button 
             key={card.id}
             onClick={() => onNavigate(card.id)}
-            className="group theme-card flex flex-col items-start text-left"
+            className="group theme-card flex flex-col items-center md:items-start text-center md:text-left !p-6 md:!p-8 h-full shadow-sm hover:shadow-xl transition-all"
           >
-            <div className={`w-12 h-12 flex items-center justify-center rounded-2xl mb-6 transition-transform group-hover:scale-110 ${card.color}`}>
+            <div className={`w-12 h-12 flex items-center justify-center rounded-2xl mb-4 md:mb-6 transition-transform group-hover:scale-110 ${card.color}`}>
               {card.icon}
             </div>
-            <h3 className="text-xl font-bold font-display mb-2">{card.title}</h3>
-            <p className="text-sm text-slate-400 font-medium">{card.desc}</p>
+            <h3 className="text-lg md:text-xl font-black text-slate-800 mb-2">{card.title}</h3>
+            <p className="text-slate-400 text-xs md:text-sm font-medium line-clamp-2 md:line-clamp-none leading-relaxed tracking-tight">{card.desc}</p>
           </button>
         ))}
         <button 
