@@ -48,6 +48,19 @@ async function retryAI(callback: () => Promise<any>, maxRetries = 2) {
 // --- API Routes ---
 
 // 1. Gold Price API
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
+app.get('/api/debug-keys', (req, res) => {
+  res.json({
+    BEEKNOEE: BEEKNOEE_API_KEY ? `Present (ends in ${BEEKNOEE_API_KEY.slice(-4)})` : 'Missing',
+    MISTRAL: MISTRAL_API_KEY ? `Present (ends in ${MISTRAL_API_KEY.slice(-4)})` : 'Missing',
+    WEATHER: OPENWEATHER_API_KEY ? `Present (ends in ${OPENWEATHER_API_KEY.slice(-4)})` : 'Missing',
+    AQI: WAQI_TOKEN ? `Present (ends in ${WAQI_TOKEN.slice(-4)})` : 'Missing',
+    SERP: SERPAPI_KEY ? `Present (ends in ${SERPAPI_KEY.slice(-4)})` : 'Missing',
+    NODE_ENV: process.env.NODE_ENV
+  });
+});
+
 app.get('/api/gold/prices', (req, res) => {
     // ... no changes to gold API
     const { type, days, action } = req.query;
@@ -233,9 +246,12 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const PORT = 3000;
-if (process.env.NODE_ENV !== "production") {
+// Only listen if not on Vercel (where it should be exported)
+// In AI Studio, we always want to listen on port 3000 for both Dev and Production
+if (!process.env.VERCEL) {
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`[Server] Listening on port ${PORT}`);
+    console.log(`[Server] Environment: ${process.env.NODE_ENV}`);
   });
 }
 
