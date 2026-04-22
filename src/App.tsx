@@ -29,7 +29,6 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import axios from 'axios';
-import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
 import { 
   onAuthStateChanged, 
@@ -50,7 +49,7 @@ import {
 import { auth, signIn, logout, db } from './lib/firebase';
 
 // --- Configuration & Services ---
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Gemini removed per request
 
 // --- Error Handling ---
 interface FirestoreErrorInfo {
@@ -153,8 +152,8 @@ const translations = {
     wind_velocity: 'Tốc độ gió',
     forecast: 'Dự báo 5 ngày',
     aqi_title: 'Chỉ số chất lượng không khí (AQI)',
-    aqi_desc: 'AQI đo tính toàn vẹn của khí quyển. Giá trị càng thấp càng tốt.',
-    realtime_notice: 'Dữ liệu cập nhật từ Open-Meteo API.',
+    aqi_desc: 'Chỉ số đo mức độ ô nhiễm không khí. Giá trị thấp nghĩa là không khí trong lành.',
+    realtime_notice: 'Dữ liệu từ OpenWeatherMap & WAQI.',
     financial_assets: 'Tài sản tài chính',
     value_unit: 'Đơn vị: VNĐ / Lượng',
     liquid_buy: 'Giá mua',
@@ -190,7 +189,18 @@ const translations = {
     ai_food_prompt: (ing: string) => `Nguyên liệu đang có: ${ing}. Hãy gợi ý 3-5 món ăn ngon, kèm theo công thức ngắn gọn và lưu ý khi nấu. Trình bày bằng tiếng Việt, định dạng Markdown rõ ràng.`,
     ai_food_system: 'Bạn là một đầu bếp chuyên gia người Việt Nam, thân thiện và sáng tạo.',
     ai_power_prompt: (area: string) => `Khu vực: ${area}. Hãy trả về tên Tỉnh/Thành phố trực thuộc trung ương chuẩn nhất ở Việt Nam cho khu vực này (VD: "Hà Nội" hoặc "Hồ Chí Minh").`,
-    ai_power_system: 'Bạn là chuyên gia địa lý Việt Nam. Trả lời cực kỳ ngắn gọn, chỉ trả tên tỉnh thành.'
+    ai_power_system: 'Bạn là chuyên gia địa lý Việt Nam. Trả lời cực kỳ ngắn gọn, chỉ trả tên tỉnh thành.',
+    nav_search: 'Tìm kiếm',
+    search_explore: 'Khám phá thế giới',
+    search_desc: 'Tìm kiếm địa điểm, quán ăn và thông tin từ Google.',
+    google_search: 'Tìm kiếm Google',
+    google_maps: 'Bản đồ Google',
+    search_results: 'Kết quả tìm kiếm',
+    map_results: 'Địa điểm tìm thấy',
+    rating: 'Đánh giá',
+    model_deepseek: 'DeepSeek (Beeknoee)',
+    model_mistral: 'Mistral AI',
+    select_model: 'Chọn mô hình AI',
   },
   en: {
     nav_home: 'Home',
@@ -249,8 +259,8 @@ const translations = {
     wind_velocity: 'Wind Velocity',
     forecast: '5-Day Forecast',
     aqi_title: 'Air Quality Index (AQI)',
-    aqi_desc: 'AQI measures atmospheric integrity. Lower is better.',
-    realtime_notice: 'Data updated from Open-Meteo API.',
+    aqi_desc: 'Measures air pollution levels. Lower values indicate cleaner air.',
+    realtime_notice: 'Data from OpenWeatherMap & WAQI.',
     financial_assets: 'Financial Assets',
     value_unit: 'Unit: VNĐ / Tael',
     liquid_buy: 'Buy Price',
@@ -286,7 +296,18 @@ const translations = {
     ai_food_prompt: (ing: string) => `Ingredients: ${ing}. Suggest 3-5 recipes with concise instructions. Present in English, Markdown format.`,
     ai_food_system: 'You are an expert chef, creative and helpful.',
     ai_power_prompt: (area: string) => `Area: ${area}. Return the most accurate Province/City name in Vietnam for this area.`,
-    ai_power_system: 'You are a Vietnam geography expert. Respond briefly with just the city name.'
+    ai_power_system: 'You are a Vietnam geography expert. Respond briefly with just the city name.',
+    nav_search: 'Search',
+    search_explore: 'Explore the World',
+    search_desc: 'Find places, food, and info from Google ecosystem.',
+    google_search: 'Google Search',
+    google_maps: 'Google Maps',
+    search_results: 'Search Results',
+    map_results: 'Local results',
+    rating: 'Rating',
+    model_deepseek: 'DeepSeek (Beeknoee)',
+    model_mistral: 'Mistral AI',
+    select_model: 'Select AI Model',
   },
   zh: {
     nav_home: '首页',
@@ -345,8 +366,8 @@ const translations = {
     wind_velocity: '风速',
     forecast: '5天预报',
     aqi_title: '空气质量指数 (AQI)',
-    aqi_desc: 'AQI 测量大气完整性。数值越低越好。',
-    realtime_notice: '数据更新自 Open-Meteo API。',
+    aqi_desc: '测量空气污染程度。数值越低表示空气越清新。',
+    realtime_notice: '数据来自 OpenWeatherMap 和 WAQI。',
     financial_assets: '金融资产',
     value_unit: '单位：越南盾 / 两',
     liquid_buy: '买入价',
@@ -382,7 +403,18 @@ const translations = {
     ai_food_prompt: (ing: string) => `现有食材：${ing}。请推荐 3-5 道菜，并附上简短的说明。请用中文呈现，采用 Markdown 格式。`,
     ai_food_system: '你是一位专业的厨师，富有创意且乐于助人。',
     ai_power_prompt: (area: string) => `区域：${area}。请返回越南该地区最准确的省/市名称（如 “河内” 或 “胡志明市”）。`,
-    ai_power_system: '你是一位越南地理专家。请简短回答，仅提供城市名称。'
+    ai_power_system: '你是一位越南地理专家。请简短回答，仅提供城市名称。',
+    nav_search: '搜索',
+    search_explore: '探索世界',
+    search_desc: '从谷歌生态系统中寻找地点、美食和信息。',
+    google_search: '谷歌搜索',
+    google_maps: '谷歌地图',
+    search_results: '搜索结果',
+    map_results: '本地结果',
+    rating: '评分',
+    model_deepseek: 'DeepSeek (Beeknoee)',
+    model_mistral: 'Mistral AI',
+    select_model: '选择 AI 模型',
   }
 };
 
@@ -495,6 +527,7 @@ export default function App() {
     { id: 'gold', title: t('nav_gold'), icon: <Coins size={20} /> },
     { id: 'gas', title: t('nav_gas'), icon: <Fuel size={20} /> },
     { id: 'download', title: t('nav_download'), icon: <Download size={20} /> },
+    { id: 'search', title: t('nav_search'), icon: <Search size={20} /> },
     { id: 'powercut', title: t('nav_powercut'), icon: <Zap size={20} /> },
     { id: 'profile', title: t('nav_profile'), icon: <Wand2 size={20} /> },
   ];
@@ -615,10 +648,11 @@ export default function App() {
                   )
                 )}
                 {activeView === 'food' && <FoodView t={t} />}
-                {activeView === 'weather' && <WeatherView t={t} />}
+                {activeView === 'weather' && <WeatherView t={t} lang={lang} />}
                 {activeView === 'gold' && <GoldView t={t} />}
                 {activeView === 'gas' && <GasView t={t} />}
                 {activeView === 'download' && <DownloadView t={t} />}
+                {activeView === 'search' && <SearchView t={t} />}
                 {activeView === 'powercut' && <PowerCutView t={t} />}
                 {activeView === 'profile' && (
                   user ? <ProfileView profile={profile} onSave={saveProfile} t={t} /> : (
@@ -649,6 +683,7 @@ function HomeView({ onNavigate, t }: { onNavigate: (v: string) => void, t: any }
     { id: 'gold', title: t('nav_gold'), desc: t('financial_assets'), color: 'bg-warning/10 text-warning', icon: <Coins /> },
     { id: 'gas', title: t('nav_gas'), desc: t('petrol_index'), color: 'bg-rose-500/10 text-rose-500', icon: <Fuel /> },
     { id: 'download', title: t('nav_download'), desc: t('asset_acq'), color: 'bg-purple-500/10 text-purple-500', icon: <Download /> },
+    { id: 'search', title: t('nav_search'), desc: t('search_desc'), color: 'bg-emerald-500/10 text-emerald-500', icon: <Search /> },
   ];
 
   return (
@@ -1027,23 +1062,33 @@ function FoodView({ t }: { t: any }) {
   const [ingredients, setIngredients] = useState('');
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState<'deepseek' | 'mistral'>('deepseek');
 
   const getSuggestion = async () => {
     if (!ingredients.trim()) return;
     setLoading(true);
     setResult('');
     try {
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: t('ai_food_prompt')(ingredients),
-        config: {
-          systemInstruction: t('ai_food_system')
-        }
+      const endpoint = model === 'deepseek' ? '/api/ai/beeknoee' : '/api/ai/mistral';
+      const aiModel = model === 'deepseek' ? 'glm-4.5-flash' : 'mistral-large-2512';
+      const response = await axios.post(endpoint, {
+        model: aiModel,
+        messages: [
+          { role: 'system', content: t('ai_food_system') },
+          { role: 'user', content: t('ai_food_prompt')(ingredients) }
+        ],
+        temperature: 0.7
       });
-      setResult(response.text || t('no_metadata'));
-    } catch (e) {
+      setResult(response.data.choices[0].message.content || t('no_metadata'));
+    } catch (e: any) {
       console.error("AI Error:", e);
-      setResult("⚠️ " + t('weather_error'));
+      if (e.response?.status === 401) {
+        setResult("⚠️ Unauthorized: Your API key for " + model + " seems invalid or expired.");
+      } else if (e.response?.status === 429) {
+        setResult("⚠️ " + (e.response?.data?.error || "Rate limit reached. Please wait a moment."));
+      } else {
+        setResult("⚠️ " + t('weather_error'));
+      }
     } finally {
       setLoading(false);
     }
@@ -1056,9 +1101,23 @@ function FoodView({ t }: { t: any }) {
           <Utensils />
         </div>
         <h3 className="text-3xl font-black mb-4 font-display text-brand">{t('cuisine_title')}</h3>
-        <p className="text-slate-500 text-sm mb-8 leading-loose font-medium">
-          {t('cuisine_desc')}
-        </p>
+        
+        <div className="mb-6">
+          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('select_model')}</label>
+          <div className="flex gap-2">
+            {(['deepseek', 'mistral'] as const).map(m => (
+              <button 
+                key={m}
+                onClick={() => setModel(m)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${model === m ? 'bg-brand text-white' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
+              >
+                {t(`model_${m}`)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <p className="text-slate-500 text-sm mb-8 leading-loose font-medium">{t('cuisine_desc')}</p>
         <textarea 
           className="theme-input min-h-[160px] mb-6 font-medium text-base leading-relaxed"
           placeholder={t('substrate')}
@@ -1084,7 +1143,7 @@ function FoodView({ t }: { t: any }) {
   );
 }
 
-function WeatherView({ t }: { t: any }) {
+function WeatherView({ t, lang }: { t: any, lang: string }) {
   const [addr, setAddr] = useState('');
   const [weather, setWeather] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -1094,55 +1153,64 @@ function WeatherView({ t }: { t: any }) {
     setLoading(true);
     setWeather(null);
     try {
-      // Step 1: Geocoding via Open-Meteo
-      const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(addr)}&count=1&language=vi&format=json`;
-      const { data: geoData } = await axios.get(geoUrl);
+      // Step 1: Geocoding via Internal Proxy
+      const { data: geoData } = await axios.get(`/api/geocoding?q=${encodeURIComponent(addr)}`);
       
-      if (!geoData.results || geoData.results.length === 0) {
+      if (!geoData || geoData.length === 0) {
         alert(t('weather_not_found'));
         return;
       }
 
-      const { latitude, longitude, name, country } = geoData.results[0];
+      const { lat, lon, name, country } = geoData[0];
 
       // Step 2: Weather & AQI
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
-      const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&current=us_aqi`;
-      
       const [{ data: wData }, { data: aData }] = await Promise.all([
-        axios.get(weatherUrl),
-        axios.get(aqiUrl)
+        axios.get(`/api/weather?lat=${lat}&lon=${lon}`),
+        axios.get(`/api/aqi?latlng=${lat},${lon}`)
       ]);
+
+      const aqiValue = (aData.status === 'ok' && typeof aData.data?.aqi === 'number') ? aData.data.aqi : null;
 
       setWeather({
         current: wData.current,
-        daily: wData.daily,
-        aqi: aData.current.us_aqi,
+        daily: wData.daily || [],
+        aqi: aqiValue,
         location: { name, country }
       });
-    } catch (e) {
-      alert(t('weather_error'));
+    } catch (e: any) {
+      console.error("API Fetch Error:", e);
+      if (e.response?.status === 401) {
+        alert("⚠️ Unauthorized: Please check your API keys or subscription level (e.g., OpenWeather One Call 3.0).");
+      } else {
+        alert(t('weather_error'));
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const getWeatherVisuals = (code: number) => {
-    if (code === 0) return { label: t('vi' === 'vi' ? 'Trời quang' : 'Clear'), color: 'text-yellow-400' };
-    if (code >= 1 && code <= 3) return { label: t('vi' === 'vi' ? 'Ít mây' : 'Few clouds'), color: 'text-gray-400' };
-    if (code >= 45 && code <= 48) return { label: t('vi' === 'vi' ? 'Sương mù' : 'Fog'), color: 'text-gray-300' };
-    if (code >= 51 && code <= 67) return { label: t('vi' === 'vi' ? 'Mưa nhỏ' : 'Drizzle'), color: 'text-blue-400' };
-    if (code >= 71 && code <= 77) return { label: t('vi' === 'vi' ? 'Tuyết' : 'Snow'), color: 'text-white' };
-    if (code >= 80 && code <= 99) return { label: t('vi' === 'vi' ? 'Mưa rào' : 'Showers'), color: 'text-blue-600' };
-    return { label: t('vi' === 'vi' ? 'Nhiều mây' : 'Overcast'), color: 'text-gray-500' };
+  const getWeatherVisuals = (condition: string) => {
+    const c = condition.toLowerCase();
+    if (c.includes('clear')) return { label: lang === 'vi' ? 'Trời quang' : 'Clear', color: 'text-yellow-400' };
+    if (c.includes('cloud')) return { label: lang === 'vi' ? 'Nhiều mây' : 'Cloudy', color: 'text-slate-400' };
+    if (c.includes('rain')) return { label: lang === 'vi' ? 'Mưa' : 'Rain', color: 'text-blue-500' };
+    if (c.includes('snow')) return { label: lang === 'vi' ? 'Tuyết' : 'Snow', color: 'text-blue-200' };
+    if (c.includes('mist') || c.includes('fog')) return { label: lang === 'vi' ? 'Sương mù' : 'Fog', color: 'text-slate-300' };
+    return { label: condition, color: 'text-brand' };
+  };
+
+  const aqiLabels: Record<string, string[]> = {
+    vi: ['Tốt', 'Trung bình', 'Kém', 'Xấu', 'Rất xấu'],
+    en: ['Good', 'Moderate', 'Unhealthy for sensitive', 'Unhealthy', 'Very Unhealthy'],
+    zh: ['优', '良', '轻度污染', '中度污染', '重度污染']
   };
 
   const aqiMap = [
-    { label: t('vi' === 'vi' ? 'Tốt' : 'Good'), color: 'bg-green-500', text: 'text-green-500', max: 50 },
-    { label: t('vi' === 'vi' ? 'Trung bình' : 'Moderate'), color: 'bg-yellow-500', text: 'text-yellow-500', max: 100 },
-    { label: t('vi' === 'vi' ? 'Kém' : 'Unhealthy for sensitive'), color: 'bg-orange-500', text: 'text-orange-500', max: 150 },
-    { label: t('vi' === 'vi' ? 'Xấu' : 'Unhealthy'), color: 'bg-red-500', text: 'text-red-500', max: 200 },
-    { label: t('vi' === 'vi' ? 'Rất xấu' : 'Very Unhealthy'), color: 'bg-purple-500', text: 'text-purple-500', max: 999 },
+    { label: (aqiLabels[lang] || aqiLabels.vi)[0], color: 'bg-green-500', text: 'text-green-500', max: 50 },
+    { label: (aqiLabels[lang] || aqiLabels.vi)[1], color: 'bg-yellow-500', text: 'text-yellow-500', max: 100 },
+    { label: (aqiLabels[lang] || aqiLabels.vi)[2], color: 'bg-orange-500', text: 'text-orange-500', max: 150 },
+    { label: (aqiLabels[lang] || aqiLabels.vi)[3], color: 'bg-red-500', text: 'text-red-500', max: 200 },
+    { label: (aqiLabels[lang] || aqiLabels.vi)[4], color: 'bg-purple-500', text: 'text-purple-500', max: 999 },
   ];
 
   const getAQIInfo = (val: number) => aqiMap.find(m => val <= m.max) || aqiMap[4];
@@ -1174,20 +1242,20 @@ function WeatherView({ t }: { t: any }) {
                <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest mb-6">
                   <MapPin size={12} className="text-brand" /> {weather.location.name}, {weather.location.country}
                </div>
-               <div className="text-9xl font-black font-display text-brand tracking-tighter mb-4">{Math.round(weather.current.temperature_2m)}°</div>
-               <p className={`text-2xl font-black uppercase tracking-tight ${getWeatherVisuals(weather.current.weather_code).color}`}>
-                {getWeatherVisuals(weather.current.weather_code).label}
+               <div className="text-9xl font-black font-display text-brand tracking-tighter mb-4">{Math.round(weather.current.temp)}°</div>
+               <p className={`text-2xl font-black uppercase tracking-tight ${getWeatherVisuals(weather.current.weather[0].main).color}`}>
+                {getWeatherVisuals(weather.current.weather[0].main).label}
                </p>
                
                <div className="grid grid-cols-2 gap-6 mt-12">
                   <div className="bg-white p-6 rounded-[24px] border border-slate-50 shadow-sm">
                     <Droplets size={24} className="mx-auto text-sky-500 mb-3" />
-                    <div className="text-2xl font-black text-slate-800">{weather.current.relative_humidity_2m}%</div>
+                    <div className="text-2xl font-black text-slate-800">{weather.current.humidity}%</div>
                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t('humidity')}</div>
                   </div>
                   <div className="bg-white p-6 rounded-[24px] border border-slate-50 shadow-sm">
                     <Wind size={24} className="mx-auto text-accent mb-3" />
-                    <div className="text-2xl font-black text-slate-800">{Math.round(weather.current.wind_speed_10m)} <span className="text-sm">km/h</span></div>
+                    <div className="text-2xl font-black text-slate-800">{Math.round(weather.current.wind_speed)} <span className="text-sm">m/s</span></div>
                     <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t('wind_velocity')}</div>
                   </div>
                </div>
@@ -1196,14 +1264,14 @@ function WeatherView({ t }: { t: any }) {
             <div className="theme-card">
               <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">{t('forecast')}</h3>
               <div className="grid grid-cols-5 gap-3">
-                {weather.daily.time.slice(0, 5).map((tValue: string, i: number) => {
-                  const date = new Date(tValue);
-                  const visual = getWeatherVisuals(weather.daily.weather_code[i]);
+                {weather.daily.slice(0, 5).map((dValue: any, i: number) => {
+                  const date = new Date(dValue.dt * 1000);
+                  const visual = getWeatherVisuals(dValue.weather[0].main);
                   return (
-                    <div key={tValue} className="text-center p-5 bg-slate-50 rounded-[24px] border border-slate-100/50">
+                    <div key={i} className="text-center p-5 bg-slate-50 rounded-[24px] border border-slate-100/50">
                       <div className="text-[10px] font-bold text-slate-400 mb-3">{date.getDate()}/{date.getMonth() + 1}</div>
-                      <div className={`text-2xl font-black mb-1 ${visual.color}`}>{Math.round(weather.daily.temperature_2m_max[i])}°</div>
-                      <div className="text-[10px] font-black text-slate-300">{Math.round(weather.daily.temperature_2m_min[i])}°</div>
+                      <div className={`text-2xl font-black mb-1 ${visual.color}`}>{Math.round(dValue.temp.max)}°</div>
+                      <div className="text-[10px] font-black text-slate-300">{Math.round(dValue.temp.min)}°</div>
                     </div>
                   );
                 })}
@@ -1214,17 +1282,23 @@ function WeatherView({ t }: { t: any }) {
           <div className="lg:col-span-1 space-y-8">
             <div className={`theme-card text-center bg-white`}>
                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">{t('aqi_title')}</h3>
-               <div className={`text-8xl font-black font-display tracking-tighter mb-4 ${getAQIInfo(weather.aqi).text}`}>{weather.aqi}</div>
-               <div className={`inline-block px-6 py-2 rounded-full text-xs font-black text-white mb-10 shadow-lg ${getAQIInfo(weather.aqi).color}`}>
-                {getAQIInfo(weather.aqi).label.toUpperCase()}
-               </div>
+               {weather.aqi !== null ? (
+                 <>
+                   <div className={`text-8xl font-black font-display tracking-tighter mb-4 ${getAQIInfo(weather.aqi).text}`}>{weather.aqi}</div>
+                   <div className={`inline-block px-6 py-2 rounded-full text-xs font-black text-white mb-10 shadow-lg ${getAQIInfo(weather.aqi).color}`}>
+                    {(getAQIInfo(weather.aqi).label || '').toUpperCase()}
+                   </div>
 
-               <div className="h-3 w-full bg-slate-50 rounded-full relative overflow-hidden mt-6 ring-4 ring-slate-50/50">
-                  <div 
-                    className={`h-full ${getAQIInfo(weather.aqi).color} transition-all duration-1000`} 
-                    style={{ width: `${Math.min((weather.aqi / 300) * 100, 100)}%` }} 
-                  />
-               </div>
+                   <div className="h-3 w-full bg-slate-50 rounded-full relative overflow-hidden mt-6 ring-4 ring-slate-50/50">
+                      <div 
+                        className={`h-full ${getAQIInfo(weather.aqi).color} transition-all duration-1000`} 
+                        style={{ width: `${Math.min((weather.aqi / 300) * 100, 100)}%` }} 
+                      />
+                   </div>
+                 </>
+               ) : (
+                 <div className="py-12 text-slate-300 font-bold italic">{t('no_metadata')}</div>
+               )}
                <p className="text-[10px] text-slate-400 font-bold mt-8 leading-relaxed px-4">
                 {t('aqi_desc')}
                </p>
@@ -1244,21 +1318,24 @@ function WeatherView({ t }: { t: any }) {
 }
 
 function GoldView({ t }: { t: any }) {
-  const [data, setData] = useState([
-    { name: 'SJC 9999', buy: 89000000, sell: 92000000, change: 0.5 },
-    { name: 'PNJ 24K', buy: 74200000, sell: 75500000, change: -0.2 },
-    { name: 'Doji 9999', buy: 88500000, sell: 91500000, change: 0.8 },
-    { name: 'Bảo Tín Minh Châu', buy: 89100000, sell: 91900000, change: 0.1 },
-  ]);
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const refresh = () => {
-    setData(data.map(d => ({
-      ...d,
-      buy: d.buy + (Math.random() - 0.5) * 500000,
-      sell: d.sell + (Math.random() - 0.5) * 500000,
-      change: (Math.random() - 0.5) * 2
-    })));
+  const fetchPrices = async () => {
+    setLoading(true);
+    try {
+      const { data: res } = await axios.get('/api/gold/prices');
+      setData(res);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchPrices();
+  }, []);
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -1267,37 +1344,131 @@ function GoldView({ t }: { t: any }) {
           <h3 className="text-3xl font-black font-display text-brand tracking-tight">{t('financial_assets')}</h3>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{t('value_unit')}</p>
         </div>
-        <button onClick={refresh} className="p-4 bg-slate-50 text-brand rounded-[20px] hover:bg-brand hover:text-white transition-all shadow-sm">
-          <RotateCcw size={24} />
+        <button onClick={fetchPrices} disabled={loading} className="p-4 bg-slate-50 text-brand rounded-[20px] hover:bg-brand hover:text-white transition-all shadow-sm">
+          <RotateCcw size={24} className={loading ? 'animate-spin' : ''} />
         </button>
       </div>
 
       <div className="space-y-4">
         {data.map(item => (
-          <div key={item.name} className="flex flex-col sm:flex-row sm:items-center justify-between p-8 bg-white border border-slate-100 rounded-[32px] shadow-sm hover:shadow-md transition-all group">
+          <div key={item.code} className="flex flex-col sm:flex-row sm:items-center justify-between p-8 bg-white border border-slate-100 rounded-[32px] shadow-sm hover:shadow-md transition-all group">
             <div className="flex items-center gap-6 mb-6 sm:mb-0">
-               <div className="w-14 h-14 bg-warning/10 text-warning rounded-2xl flex items-center justify-center font-black text-2xl shadow-lg shadow-warning/5">G</div>
+               <div className="w-14 h-14 bg-warning/10 text-warning rounded-2xl flex items-center justify-center font-black text-2xl shadow-lg shadow-warning/5">{item.code === 'XAUUSD' ? '$' : 'G'}</div>
                <div>
                   <h4 className="font-black text-lg text-slate-800">{item.name}</h4>
-                  <div className={`text-[10px] font-black uppercase tracking-widest ${item.change >= 0 ? 'text-accent' : 'text-secondary'}`}>
-                    {item.change >= 0 ? '▲ Positive' : '▼ Negative'} {Math.abs(item.change).toFixed(2)}%
+                  <div className={`text-[10px] font-black uppercase tracking-widest text-slate-400`}>
+                    Code: {item.code}
                   </div>
                </div>
             </div>
             <div className="flex gap-12 sm:gap-20">
               <div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-2">{t('liquid_buy')}</div>
-                <div className="text-2xl font-black font-display text-slate-800 tracking-tighter">{Math.round(item.buy / 1000000).toFixed(2)} <span className="text-sm font-bold text-slate-300">Tr</span></div>
-              </div>
-              <div>
                 <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-2">{t('liquid_sell')}</div>
-                <div className="text-2xl font-black font-display text-brand tracking-tighter">{Math.round(item.sell / 1000000).toFixed(2)} <span className="text-sm font-bold text-indigo-200">Tr</span></div>
+                <div className="text-2xl font-black font-display text-brand tracking-tighter">
+                  {item.price.toLocaleString()} 
+                  <span className="text-sm font-bold text-indigo-200 ml-1">{item.code === 'XAUUSD' ? 'USD' : 'Tr'}</span>
+                </div>
               </div>
             </div>
           </div>
         ))}
       </div>
       <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest italic">{t('market_notice')}</p>
+    </div>
+  );
+}
+
+function SearchView({ t }: { t: any }) {
+  const [query, setQuery] = useState('');
+  const [type, setType] = useState<'google' | 'maps'>('google');
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<any>(null);
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    try {
+      const params: any = { q: query, hl: 'vi', gl: 'vn' };
+      if (type === 'google') {
+        params.engine = 'google';
+      } else {
+        params.engine = 'google_maps';
+        params.type = 'search';
+      }
+      const { data } = await axios.get('/api/search', { params });
+      setResults(data);
+    } catch (e: any) {
+      console.error(e);
+      if (e.response?.status === 401) {
+        alert("⚠️ Unauthorized: Your SerpApi key is invalid or has reached its quota.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div className="theme-card text-center bg-emerald-50/20 border-emerald-100">
+        <h3 className="text-3xl font-black mb-4 font-display text-emerald-600">{t('search_explore')}</h3>
+        <p className="text-slate-500 text-sm mb-8 font-medium">{t('search_desc')}</p>
+        
+        <div className="flex gap-2 justify-center mb-6">
+          <button onClick={() => setType('google')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${type === 'google' ? 'bg-emerald-500 text-white' : 'bg-white text-slate-400 border border-slate-100'}`}>{t('google_search')}</button>
+          <button onClick={() => setType('maps')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${type === 'maps' ? 'bg-emerald-500 text-white' : 'bg-white text-slate-400 border border-slate-100'}`}>{t('google_maps')}</button>
+        </div>
+
+        <div className="flex gap-3">
+          <input 
+            className="theme-input flex-1"
+            placeholder={type === 'google' ? t('google_search') : t('google_maps')}
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSearch()}
+          />
+          <button onClick={handleSearch} disabled={loading} className="theme-btn-primary bg-emerald-500 min-w-[120px] shadow-emerald-200">
+            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" /> : <Search size={20} className="mx-auto" />}
+          </button>
+        </div>
+      </div>
+
+      {results && (
+        <div className="grid grid-cols-1 gap-6">
+          {type === 'google' ? (
+            <div className="space-y-4">
+              <h4 className="text-sm font-black uppercase tracking-widest text-slate-400">{t('search_results')}</h4>
+              {results.organic_results?.map((res: any, idx: number) => (
+                <div key={idx} className="theme-card">
+                  <a href={res.link} target="_blank" className="text-lg font-black text-brand hover:underline block mb-1">{res.title}</a>
+                  <p className="text-slate-500 text-sm leading-relaxed">{res.snippet}</p>
+                  <div className="text-[10px] text-slate-300 font-bold mt-2 truncate">{res.displayed_link}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h4 className="col-span-full text-sm font-black uppercase tracking-widest text-slate-400">{t('map_results')}</h4>
+              {results.local_results?.map((place: any, idx: number) => (
+                <div key={idx} className="theme-card flex gap-4">
+                  <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shrink-0">
+                    <MapPin size={32} />
+                  </div>
+                  <div>
+                    <h5 className="font-black text-slate-800">{place.title}</h5>
+                    <p className="text-[10px] text-slate-400 mb-2">{place.address}</p>
+                    {place.rating && (
+                      <div className="flex items-center gap-2">
+                        <div className="flex text-warning">{'★'.repeat(Math.round(place.rating))}</div>
+                        <span className="text-[10px] font-black text-slate-400">{place.rating} ({place.reviews})</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -1481,14 +1652,15 @@ function PowerCutView({ t }: { t: any }) {
     if (!area.trim()) return;
     setLoading(true);
     try {
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: t('ai_power_prompt')(area),
-        config: {
-          systemInstruction: t('ai_power_system')
-        }
+      const response = await axios.post('/api/ai/beeknoee', {
+        model: 'glm-4.5-flash',
+        messages: [
+          { role: 'system', content: t('ai_power_system') },
+          { role: 'user', content: t('ai_power_prompt')(area) }
+        ],
+        temperature: 0.3
       });
-      setCity(response.text?.trim() || area);
+      setCity(response.data.choices[0].message.content?.trim() || area);
     } catch (e) {
       console.error("AI Error:", e);
       setCity(area);
