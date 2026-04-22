@@ -7,6 +7,30 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="error-display" style="display:none; color:red; padding:20px; font-family:sans-serif;">
+      <h1>Application Critical Error</h1>
+      <pre id="error-log" style="white-space: pre-wrap; font-size: 12px; border: 1px solid #fee; padding: 10px; background: #fff5f5;"></pre>
+      <p>If you see this on GitHub Pages, try using Vercel or checking if you uploaded the <b>dist</b> folder correctly.</p>
+    </div>
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        var display = document.getElementById('error-display');
+        var log = document.getElementById('error-log');
+        if (display && log) {
+          display.style.display = 'block';
+          log.textContent += "Error: " + msg + "\nAt: " + url + ":" + line + ":" + col + "\n" + (error ? error.stack : "") + "\n\n";
+        }
+      };
+      // Catch promise rejections
+      window.onunhandledrejection = function(event) {
+        var display = document.getElementById('error-display');
+        var log = document.getElementById('error-log');
+        if (display && log) {
+          display.style.display = 'block';
+          log.textContent += "Unhandled Rejection: " + event.reason + "\n\n";
+        }
+      };
+    </script>
     <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
