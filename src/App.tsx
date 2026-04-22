@@ -66,7 +66,7 @@ interface FirestoreErrorInfo {
 }
 
 function handleFirestoreError(error: any, operation: FirestoreErrorInfo['operationType'], path: string | null = null) {
-  const user = auth.currentUser;
+  const user = auth?.currentUser;
   const errorInfo: FirestoreErrorInfo = {
     error: error.message || String(error),
     operationType: operation,
