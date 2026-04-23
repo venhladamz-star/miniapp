@@ -514,19 +514,12 @@ export default function App() {
 
   const handleSignIn = async () => {
     try {
-      if (!auth) {
-        alert("Firebase is not initialized. Please check your config.");
-        return;
-      }
       await signIn();
     } catch (error: any) {
       if (error.code === 'auth/popup-closed-by-user') {
         console.warn("User closed the sign-in popup.");
-      } else if (error.code === 'auth/unauthorized-domain') {
-        alert("Domain Not Authorized: Please add this domain to authorized domains in Firebase Console.");
       } else {
         console.error("Authentication Error:", error);
-        alert(`Login failed: ${error.message}`);
       }
     }
   };
@@ -651,7 +644,7 @@ export default function App() {
           </div>
         </header>
 
-        <div className="pt-[84px] px-3 md:px-6 pb-28 md:pb-12 max-w-5xl mx-auto">
+        <div className="pt-[84px] px-4 md:px-6 pb-24 md:pb-12 max-w-5xl mx-auto">
           {loading ? (
             <div className="flex items-center justify-center py-24">
               <div className="w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
@@ -738,27 +731,27 @@ function HomeView({ onNavigate, t }: { onNavigate: (v: string) => void, t: any }
 
   return (
     <div className="text-center md:text-left">
-      <div className="mb-10 md:mb-16">
-        <h1 className="text-4xl md:text-7xl font-black font-display tracking-tight text-brand mb-4 leading-[1.1]">
+      <div className="mb-16">
+        <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight text-brand mb-4">
           {t('hub_title')}
         </h1>
-        <p className="text-slate-500 text-lg md:text-xl font-medium max-w-2xl mx-auto md:mx-0">
+        <p className="text-slate-500 text-xl font-medium max-w-2xl">
           {t('hub_desc')}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pb-20">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {cards.map(card => (
           <button 
             key={card.id}
             onClick={() => onNavigate(card.id)}
-            className="group theme-card flex flex-col items-center md:items-start text-center md:text-left !p-6 md:!p-8 h-full shadow-sm hover:shadow-xl transition-all"
+            className="group theme-card flex flex-col items-start text-left"
           >
-            <div className={`w-12 h-12 flex items-center justify-center rounded-2xl mb-4 md:mb-6 transition-transform group-hover:scale-110 ${card.color}`}>
+            <div className={`w-12 h-12 flex items-center justify-center rounded-2xl mb-6 transition-transform group-hover:scale-110 ${card.color}`}>
               {card.icon}
             </div>
-            <h3 className="text-lg md:text-xl font-black text-slate-800 mb-2">{card.title}</h3>
-            <p className="text-slate-400 text-xs md:text-sm font-medium line-clamp-2 md:line-clamp-none leading-relaxed tracking-tight">{card.desc}</p>
+            <h3 className="text-xl font-bold font-display mb-2">{card.title}</h3>
+            <p className="text-sm text-slate-400 font-medium">{card.desc}</p>
           </button>
         ))}
         <button 
