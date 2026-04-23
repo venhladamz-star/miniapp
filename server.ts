@@ -232,11 +232,13 @@ app.get('/api/search', async (req, res) => {
 
 // Vite middleware for development
 if (process.env.NODE_ENV !== "production") {
-  const vite = await createViteServer({
-    server: { middlewareMode: true },
-    appType: "spa",
-  });
-  app.use(vite.middlewares);
+  (async () => {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+  })();
 } else {
   const distPath = path.join(process.cwd(), "dist");
   app.use(express.static(distPath));
