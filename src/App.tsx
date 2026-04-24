@@ -596,8 +596,9 @@ export default function App() {
       <aside className={`fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r border-slate-100 z-[100] transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-slate-50 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black font-display cursor-pointer" onClick={() => setActiveView('home')}>
-              <span className="text-brand">Life</span>Hub
+            <h1 className="text-2xl font-black font-display cursor-pointer flex items-center bg-[#1a1a1a] rounded-lg px-3 py-1.5" onClick={() => setActiveView('home')}>
+              <span className="text-white">Life</span>
+              <span className="bg-[#f7971d] text-black px-1.5 py-0.5 rounded-md ml-1">hub</span>
             </h1>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 ml-1">Open-source Hub</p>
           </div>
@@ -759,8 +760,10 @@ function HomeView({ onNavigate, t }: { onNavigate: (v: string) => void, t: any }
   return (
     <div className="text-center md:text-left">
       <div className="mb-16">
-        <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight text-brand mb-4">
-          {t('hub_title')}
+        <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight mb-4 flex items-center justify-center md:justify-start gap-2">
+          <span className="bg-[#1a1a1a] text-white px-4 py-2 rounded-3xl">Life</span>
+          <span className="bg-[#f7971d] text-black px-4 py-2 rounded-3xl">hub</span>
+          <span className="text-slate-200 text-3xl md:text-4xl grow-0 shrink-0 ml-2 italic">v2.0</span>
         </h1>
         <p className="text-slate-500 text-xl font-medium max-w-2xl">
           {t('hub_desc')}
