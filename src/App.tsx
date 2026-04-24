@@ -47,6 +47,8 @@ import {
   getDocFromServer
 } from 'firebase/firestore';
 import { auth, signIn, logout, db } from './lib/firebase';
+import { Lunar, Solar } from 'lunar-javascript';
+import { Lunar, Solar } from 'lunar-javascript';
 
 // --- Configuration & Services ---
 // Gemini removed per request
@@ -191,6 +193,14 @@ const translations = {
     ai_power_prompt: (area: string) => `Khu vực: ${area}. Hãy trả về tên Tỉnh/Thành phố trực thuộc trung ương chuẩn nhất ở Việt Nam cho khu vực này (VD: "Hà Nội" hoặc "Hồ Chí Minh").`,
     ai_power_system: 'Bạn là chuyên gia địa lý Việt Nam. Trả lời cực kỳ ngắn gọn, chỉ trả tên tỉnh thành.',
     nav_search: 'Tìm kiếm',
+    nav_lunar: 'Lịch Âm',
+    lunar_title: 'Lịch Âm Dương',
+    lunar_desc: 'Tra cứu thông tin ngày âm lịch, ngày hoàng đạo và các tiết khí.',
+    lunar_today: 'Hôm nay',
+    ai_lunar_prompt: (date: string) => `Hãy cung cấp thông tin ngày tốt xấu chi tiết, tử vi phong thủy cho ngày dương lịch ${date}. Bao gồm: Ngày âm lịch (có can chi), Giờ hoàng đạo, Tuổi xung khắc, Việc nên làm, Việc cần kiêng kỵ. Trình bày bằng tiếng Việt, định dạng Markdown rõ ràng, chia làm các gạch đầu dòng súc tích.`,
+    ai_lunar_system: 'Bạn là chuyên gia tử vi và phong thủy văn hóa phương Đông cổ.',
+    lunar_details: 'Chi Tiết Ngày Tốt Xấu',
+    analyzing: 'Đang thỉnh vấn AI...',
     search_explore: 'Khám phá thế giới',
     search_desc: 'Tìm kiếm địa điểm, quán ăn và thông tin từ Google.',
     google_search: 'Tìm kiếm Google',
@@ -298,6 +308,14 @@ const translations = {
     ai_power_prompt: (area: string) => `Area: ${area}. Return the most accurate Province/City name in Vietnam for this area.`,
     ai_power_system: 'You are a Vietnam geography expert. Respond briefly with just the city name.',
     nav_search: 'Search',
+    nav_lunar: 'Lunar Cal',
+    lunar_title: 'Lunisolar Calendar',
+    lunar_desc: 'Look up lunar dates, auspicious days, and solar terms.',
+    lunar_today: 'Today',
+    ai_lunar_prompt: (date: string) => `Provide detailed Eastern astrological and lunar info for the solar date ${date}. Include: Lunar date (with stems/branches), Auspicious hours, Conflicting zodiac signs, Recommended activities, Activities to avoid. Format clearly in short Markdown.`,
+    ai_lunar_system: 'You are a Feng Shui and Eastern Astrology grandmaster.',
+    lunar_details: 'Auspicious Details',
+    analyzing: 'Consulting AI...',
     search_explore: 'Explore the World',
     search_desc: 'Find places, food, and info from Google ecosystem.',
     google_search: 'Google Search',
@@ -405,6 +423,14 @@ const translations = {
     ai_power_prompt: (area: string) => `区域：${area}。请返回越南该地区最准确的省/市名称（如 “河内” 或 “胡志明市”）。`,
     ai_power_system: '你是一位越南地理专家。请简短回答，仅提供城市名称。',
     nav_search: '搜索',
+    nav_lunar: '农历',
+    lunar_title: '农历日历',
+    lunar_desc: '查询农历日期、黄道吉日和节气。',
+    lunar_today: '今天',
+    ai_lunar_prompt: (date: string) => `提供公历 ${date} 的详细东方星象和农历信息。包括：农历日期（含天干地支）、黄道吉时、冲煞生肖、宜做事项、忌讳事项。请使用简短且清晰的 Markdown 格式。`,
+    ai_lunar_system: '你是一位精通风水和东方命理的大师。',
+    lunar_details: '吉凶详情',
+    analyzing: '正在咨询 AI...',
     search_explore: '探索世界',
     search_desc: '从谷歌生态系统中寻找地点、美食和信息。',
     google_search: '谷歌搜索',
@@ -533,6 +559,7 @@ export default function App() {
     { id: 'gas', title: t('nav_gas'), icon: <Fuel size={20} /> },
     { id: 'download', title: t('nav_download'), icon: <Download size={20} /> },
     { id: 'search', title: t('nav_search'), icon: <Search size={20} /> },
+    { id: 'lunar', title: t('nav_lunar'), icon: <CloudSun size={20} /> },
     { id: 'powercut', title: t('nav_powercut'), icon: <Zap size={20} /> },
     { id: 'profile', title: t('nav_profile'), icon: <Wand2 size={20} /> },
   ];
@@ -550,8 +577,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-bg text-slate-800 font-sans">
       {/* Background Blobs */}
-      <div className="fixed top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand rounded-full blur-[100px] opacity-[0.05] pointer-events-none animate-pulse" />
-      <div className="fixed bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-secondary rounded-full blur-[100px] opacity-[0.05] pointer-events-none animate-pulse" />
+      <div className="fixed top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
+      <div className="fixed bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-secondary rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
 
       {/* Sidebar Overlay */}
       <AnimatePresence>
@@ -673,6 +700,7 @@ export default function App() {
                 {activeView === 'weather' && <WeatherView t={t} lang={lang} />}
                 {activeView === 'gold' && <GoldView t={t} />}
                 {activeView === 'gas' && <GasView t={t} />}
+                {activeView === 'lunar' && <LunarView t={t} />}
                 {activeView === 'download' && <DownloadView t={t} />}
                 {activeView === 'search' && <SearchView t={t} />}
                 {activeView === 'powercut' && <PowerCutView t={t} />}
@@ -1133,10 +1161,13 @@ function FoodView({ t }: { t: any }) {
         setResult("⚠️ Unauthorized: Your API key for " + model + " seems invalid or expired.");
       } else if (e.response?.status === 429) {
         setResult("⚠️ " + (e.response?.data?.error || "Rate limit reached. Please wait a moment."));
-      } else if (e.response?.status === 524 || e.code === 'ECONNABORTED') {
+      } else if (e.response?.status === 524 || e.response?.status === 504 || e.code === 'ECONNABORTED') {
         setResult("⚠️ AI Timeout: Server took too long to respond. The AI might be overloaded, please try again with simpler ingredients.");
+      } else if (e.response?.status >= 500) {
+        setResult("⚠️ AI Service Error: The model provider is currently experiencing issues. Please try switching AI models.");
       } else {
-        const errorDetail = e.response?.data?.error?.message || e.response?.data?.error || e.message;
+        let errorDetail = e.response?.data?.error?.message || e.response?.data?.error || e.message;
+        if (typeof errorDetail === 'object') errorDetail = JSON.stringify(errorDetail);
         setResult(`⚠️ Error: ${errorDetail}`);
       }
     } finally {
@@ -1185,8 +1216,15 @@ function FoodView({ t }: { t: any }) {
       </div>
 
       {result && (
-        <div className="theme-card md:prose prose-indigo prose-invert max-w-none prose-sm bg-indigo-50/30 border-indigo-100">
-           <ReactMarkdown>{result}</ReactMarkdown>
+        <div className="mt-8 relative overflow-hidden bg-white/80 backdrop-blur-xl border border-indigo-100 rounded-[32px] p-6 shadow-sm">
+           <div className="absolute top-0 right-0 p-8 text-brand/5 pointer-events-none">
+             <Utensils size={100} />
+           </div>
+           <div className="prose prose-sm md:prose-base prose-indigo max-w-none text-slate-700 relative z-10 
+              prose-headings:text-brand prose-headings:font-black prose-headings:tracking-tight
+              prose-strong:text-indigo-900 prose-ul:font-medium prose-p:font-medium">
+             <ReactMarkdown>{result}</ReactMarkdown>
+           </div>
         </div>
       )}
     </div>
@@ -1772,6 +1810,243 @@ function PowerCutView({ t }: { t: any }) {
           <a href="https://www.evnhcmc.vn/khach-hang/lich-ngung-giam-cung-cap-dien" target="_blank" className="text-xs font-black text-brand hover:underline">Access Terminal →</a>
         </div>
       </div>
+    </div>
+  );
+}
+
+function LunarView({ t }: { t: any }) {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDateMsg, setSelectedDateMsg] = useState<{date: Date, info: string | null} | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const fetchLunarAI = async (date: Date) => {
+    setSelectedDateMsg({ date, info: null });
+    setAiLoading(true);
+    setAiError('');
+    try {
+        const dateStr = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        const response = await axios.post('/api/ai/beeknoee', {
+            model: 'glm-4.7-flash', // Fast and reliable for basic info
+            messages: [
+                { role: 'system', content: t('ai_lunar_system') },
+                { role: 'user', content: t('ai_lunar_prompt')(dateStr) }
+            ],
+            temperature: 0.3
+        });
+        setSelectedDateMsg({ date, info: response.data.choices[0].message.content });
+    } catch (e: any) {
+        setAiError(e.response?.data?.error?.message || e.message);
+    } finally {
+        setAiLoading(false);
+    }
+  };
+
+  const solarHolidays: Record<string, string> = {
+    "1/1": "Tết Dương Lịch",
+    "14/2": "Valentine",
+    "8/3": "Quốc tế Phụ nữ",
+    "30/4": "Giải phóng MN",
+    "1/5": "Quốc tế Lao động",
+    "1/6": "Qtế Thiếu nhi",
+    "2/9": "Quốc khánh",
+    "20/10": "Phụ nữ VN",
+    "20/11": "Nhà giáo VN",
+    "22/12": "QĐND VN"
+  };
+
+  const lunarHolidays: Record<string, string> = {
+    "1/1": "Tết Nguyên Đán",
+    "15/1": "Tết Nguyên Tiêu",
+    "10/3": "Giỗ tổ Hùng Vương",
+    "15/4": "Lễ Phật Đản",
+    "5/5": "Tết Đoan Ngọ",
+    "15/7": "Lễ Vu Lan",
+    "15/8": "Tết Trung Thu",
+    "23/12": "Ông Táo"
+  };
+
+  const getDayInfo = (date: Date) => {
+    const solarStr = `${date.getDate()}/${date.getMonth() + 1}`;
+    let lunarStr = "-";
+    let pureLunar = "-";
+    try {
+      const solar = Solar.fromDate(date);
+      const lunar = Lunar.fromSolar(solar);
+      
+      const lDay = lunar.getDay();
+      const lMonth = lunar.getMonth();
+
+      pureLunar = `${lDay}/${lMonth}`;
+      if (lDay === 1) {
+          lunarStr = pureLunar;
+      } else {
+          lunarStr = lDay.toString();
+      }
+    } catch {
+      lunarStr = "-";
+    }
+
+    const solHoliday = solarHolidays[solarStr];
+    const lunHoliday = lunarHolidays[pureLunar];
+
+    return { 
+        lunarDayMonth: lunarStr, 
+        holiday: solHoliday || lunHoliday || null 
+    };
+  };
+  
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startDay = new Date(year, month, 1).getDay();
+  
+  // Shift to start week on Monday
+  const prefixDays = startDay === 0 ? 6 : startDay - 1; 
+
+  const handlePrevMonth = () => {
+    setCurrentDate(new Date(year, month - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(year, month + 1, 1));
+  };
+
+  const handleToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  const dayNames = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+
+  const renderCells = () => {
+    const cells = [];
+    const today = new Date();
+    
+    // Empty slots
+    for (let i = 0; i < prefixDays; i++) {
+        cells.push(<div key={`empty-${i}`} className="p-2 opacity-0"></div>);
+    }
+
+    // Days slots
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateObj = new Date(year, month, d);
+        const isToday = today.getDate() === d && today.getMonth() === month && today.getFullYear() === year;
+        const info = getDayInfo(dateObj);
+        
+        cells.push(
+            <div 
+                key={d} 
+                onClick={() => fetchLunarAI(dateObj)}
+                className={`cursor-pointer group relative flex flex-col items-center justify-center p-1 sm:p-2 rounded-[10px] md:rounded-2xl transition-all aspect-square border overflow-hidden ${isToday ? 'bg-brand text-white shadow-md shadow-brand/20 border-brand hover:bg-indigo-500' : 'bg-slate-50 border-slate-100 hover:border-brand/30 hover:bg-white '} ${!isToday && info.holiday ? 'bg-rose-50/50 border-rose-100' : ''}`}
+            >
+                <div className={`text-lg sm:text-xl md:text-2xl font-black z-10 ${info.holiday ? 'mt-1 md:mt-2' : ''} ${isToday ? 'text-white' : (info.holiday ? 'text-rose-600' : 'text-slate-700')}`}>
+                    {d}
+                </div>
+                <div className={`text-[8.5px] sm:text-[10px] md:text-xs font-bold leading-tight mt-0.5 z-10 ${isToday ? 'text-white/80' : 'text-brand'}`}>
+                    {info.lunarDayMonth}
+                </div>
+
+                {info.holiday && (
+                    <div className="absolute top-1 md:top-1.5 left-0 right-0 px-0.5 text-center truncate text-[5px] sm:text-[6px] md:text-[8px] font-black uppercase text-rose-500 opacity-90 group-hover:opacity-100 transition-opacity z-10" title={info.holiday}>
+                        {info.holiday}
+                    </div>
+                )}
+            </div>
+        );
+    }
+    
+    return cells;
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+      <div className="theme-card relative overflow-hidden text-center py-6 md:py-12">
+        <div className="absolute top-0 right-0 p-8 text-brand/5 pointer-events-none">
+          <CloudSun size={150} />
+        </div>
+        <h3 className="text-2xl md:text-3xl font-black mb-2 md:mb-4 font-display text-brand tracking-tight">{t('lunar_title')}</h3>
+        <p className="text-slate-500 text-xs md:text-sm font-medium">{t('lunar_desc')}</p>
+      </div>
+      
+      <div className="bg-white/80 backdrop-blur-xl border border-indigo-100 rounded-[32px] md:rounded-[40px] p-4 sm:p-6 md:p-10 shadow-sm flex flex-col">
+         <div className="w-full flex items-center justify-between mb-6 md:mb-10 pb-4 md:pb-6 border-b border-slate-100">
+            <button 
+                onClick={handlePrevMonth}
+                className="w-10 h-10 md:w-12 md:h-12 flex justify-center items-center rounded-[10px] md:rounded-2xl bg-slate-50 text-slate-400 hover:text-brand hover:bg-brand/10 transition-all font-black text-lg md:text-xl"
+            >
+                -
+            </button>
+            <div className="text-center flex flex-col items-center gap-1 md:gap-2">
+                <button 
+                    onClick={handleToday}
+                    className="px-4 py-1.5 md:px-6 md:py-2 rounded-xl md:rounded-2xl bg-brand/10 text-brand font-black uppercase tracking-widest text-[8px] md:text-[10px] hover:bg-brand hover:text-white transition-all focus:outline-none focus:ring-4 focus:ring-brand/20"
+                >
+                    {t('lunar_today')}
+                </button>
+                <h4 className="text-xl md:text-2xl font-black text-slate-800 capitalize">
+                   Tháng {month + 1}, {year}
+                </h4>
+            </div>
+            <button 
+                onClick={handleNextMonth}
+                className="w-10 h-10 md:w-12 md:h-12 flex justify-center items-center rounded-[10px] md:rounded-2xl bg-slate-50 text-slate-400 hover:text-brand hover:bg-brand/10 transition-all font-black text-lg md:text-xl"
+            >
+                +
+            </button>
+         </div>
+
+         <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4 w-full">
+             {dayNames.map(day => (
+                 <div key={day} className="text-center text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                     {day}
+                 </div>
+             ))}
+             {renderCells()}
+         </div>
+      </div>
+
+      <AnimatePresence>
+          {selectedDateMsg && (
+              <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedDateMsg(null)} />
+                  <motion.div 
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+                      animate={{ opacity: 1, scale: 1, y: 0 }} 
+                      exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+                      className="bg-white rounded-[32px] p-6 md:p-8 w-full max-w-lg relative z-10 shadow-2xl max-h-[85vh] flex flex-col"
+                  >
+                      <button onClick={() => setSelectedDateMsg(null)} className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors">
+                          <X size={20} />
+                      </button>
+                      
+                      <h4 className="text-xl md:text-2xl font-black text-brand mb-4 flex items-center gap-2">
+                          <Wand2 size={24} /> {t('lunar_details')}
+                      </h4>
+                      <p className="font-bold text-slate-800 mb-6 bg-slate-100 py-2 px-4 rounded-xl inline-block max-w-max text-sm">
+                          {selectedDateMsg.date.getDate()}/{selectedDateMsg.date.getMonth() + 1}/{selectedDateMsg.date.getFullYear()}
+                      </p>
+                      
+                      <div className="overflow-y-auto flex-1 pr-2">
+                          {aiLoading ? (
+                              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                                  <div className="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin" />
+                                  <p className="text-brand font-bold animate-pulse text-sm">{t('analyzing')}</p>
+                              </div>
+                          ) : aiError ? (
+                              <div className="p-4 bg-rose-50 text-rose-600 rounded-2xl text-sm font-medium">
+                                  ⚠️ {aiError}
+                              </div>
+                          ) : (
+                              <div className="prose prose-sm prose-slate prose-headings:text-indigo-900 prose-a:text-brand max-w-none">
+                                  <ReactMarkdown>{selectedDateMsg.info || ''}</ReactMarkdown>
+                              </div>
+                          )}
+                      </div>
+                  </motion.div>
+              </div>
+          )}
+      </AnimatePresence>
     </div>
   );
 }

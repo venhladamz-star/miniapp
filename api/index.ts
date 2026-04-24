@@ -94,8 +94,11 @@ apiApp.post('/ai/beeknoee', async (req, res) => {
     if (status === 429) {
       return res.status(429).json({ error: "AI is currently very busy. Please wait a minute and try again." });
     }
-    if (error.code === 'ECONNABORTED' || status === 524) {
+    if (error.code === 'ECONNABORTED' || status === 524 || status === 504) {
       return res.status(524).json({ error: "AI Provider timed out. The server is taking too long to respond. Please try again." });
+    }
+    if (status >= 500) {
+      return res.status(status).json({ error: "AI Service Error: The AI provider encountered an internal issue." });
     }
     res.status(status).json(data);
   }
@@ -117,8 +120,11 @@ apiApp.post('/ai/mistral', async (req, res) => {
     if (status === 429) {
       return res.status(429).json({ error: "AI service limit reached. Please switch models or try again shortly." });
     }
-    if (error.code === 'ECONNABORTED' || status === 524) {
+    if (error.code === 'ECONNABORTED' || status === 524 || status === 504) {
       return res.status(524).json({ error: "AI Provider timed out. The server is taking too long to respond. Please try again." });
+    }
+    if (status >= 500) {
+      return res.status(status).json({ error: "AI Service Error: The AI provider encountered an internal issue." });
     }
     res.status(status).json(data);
   }
