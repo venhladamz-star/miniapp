@@ -2024,14 +2024,6 @@ function LunarView({ t }: { t: any }) {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-      <div className="theme-card relative overflow-hidden text-center py-6 md:py-12">
-        <div className="absolute top-0 right-0 p-8 text-brand/5 pointer-events-none">
-          <CloudSun size={150} />
-        </div>
-        <h3 className="text-2xl md:text-3xl font-black mb-2 md:mb-4 font-display text-brand tracking-tight">{t('lunar_title')}</h3>
-        <p className="text-slate-500 text-xs md:text-sm font-medium">{t('lunar_desc')}</p>
-      </div>
-      
       <div className="bg-white/80 backdrop-blur-xl border border-indigo-100 rounded-[32px] md:rounded-[40px] p-4 sm:p-6 md:p-10 shadow-sm flex flex-col">
          <div className="w-full flex items-center justify-between mb-6 md:mb-10 pb-4 md:pb-6 border-b border-slate-100">
             <button 
