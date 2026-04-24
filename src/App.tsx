@@ -48,7 +48,6 @@ import {
 } from 'firebase/firestore';
 import { auth, signIn, logout, db } from './lib/firebase';
 import { Lunar, Solar } from 'lunar-javascript';
-import { Lunar, Solar } from 'lunar-javascript';
 
 // --- Configuration & Services ---
 // Gemini removed per request
@@ -801,6 +800,7 @@ function BankView({ profile, user, t, lang }: { profile: UserProfile, user: User
   const [tab, setTab] = useState<'debts' | 'qr'>('debts');
   const [debts, setDebts] = useState<Debt[]>([]);
   const [qrs, setQrs] = useState<QRCard[]>([]);
+  const [selectedQR, setSelectedQR] = useState<QRCard | null>(null);
 
   // Form states
   const [debtForm, setDebtForm] = useState({ person: '', amount: '', type: 'cho_vay', note: '' });
@@ -1087,14 +1087,21 @@ function BankView({ profile, user, t, lang }: { profile: UserProfile, user: User
                   <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">{t('no_crypto')}</p>
                </div>
             ) : (
-              qrs.map(qr => (
-                <div key={qr.id} className="theme-card text-center group relative overflow-hidden flex flex-col items-center">
-                  <button 
-                    onClick={() => deleteQR(qr.id)}
-                    className="absolute top-6 right-6 z-10 p-3 bg-white text-slate-300 hover:text-secondary hover:bg-secondary/5 border border-slate-100 rounded-2xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                qrs.map(qr => (
+                  <div 
+                    key={qr.id} 
+                    onClick={() => setSelectedQR(qr)}
+                    className="theme-card text-center group relative overflow-hidden flex flex-col items-center cursor-pointer hover:shadow-lg transition-all"
                   >
-                    <Trash2 size={18} />
-                  </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteQR(qr.id);
+                      }}
+                      className="absolute top-6 right-6 z-10 p-3 bg-white text-slate-300 hover:text-secondary hover:bg-secondary/5 border border-slate-100 rounded-2xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   
                   <h4 className="font-black text-xl text-slate-800 mb-8 tracking-tight">{qr.name}</h4>
                   
@@ -1125,6 +1132,62 @@ function BankView({ profile, user, t, lang }: { profile: UserProfile, user: User
           </div>
         </div>
       )}
+
+      {/* Enlarged QR Modal */}
+      <AnimatePresence>
+        {selectedQR && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedQR(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-[40px] p-8 md:p-12 w-full max-w-lg relative z-10 shadow-2xl flex flex-col items-center"
+            >
+              <button 
+                onClick={() => setSelectedQR(null)}
+                className="absolute top-6 right-6 p-3 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors"
+              >
+                <X size={24} />
+              </button>
+
+              <h3 className="font-black text-2xl text-slate-800 mb-8 font-display">{selectedQR.name}</h3>
+
+              <div className="relative mb-8 w-full">
+                <div className="absolute inset-0 bg-brand/5 blur-[100px] rounded-full"></div>
+                {selectedQR.image ? (
+                  <img 
+                    src={selectedQR.image} 
+                    alt={selectedQR.name} 
+                    className="relative w-full aspect-square object-contain rounded-[32px] border-8 border-white shadow-xl" 
+                  />
+                ) : (
+                  <div className="relative w-full aspect-square bg-slate-50 border-4 border-white rounded-[32px] flex items-center justify-center text-slate-200">
+                    <QrCode size={128} />
+                  </div>
+                )}
+              </div>
+
+              <div className="w-full space-y-4 pt-8 border-t border-slate-50">
+                <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl">
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('id_no')}</span>
+                  <span className="font-black text-brand text-lg font-mono">{selectedQR.number}</span>
+                </div>
+                <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl">
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('bearer')}</span>
+                  <span className="font-black text-slate-800 text-lg uppercase">{selectedQR.holder}</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
