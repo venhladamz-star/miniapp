@@ -5,32 +5,116 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   
-  --color-brand: #6366f1;
-  --color-secondary: #f43f5e;
+  --color-brand: var(--brand, #6366f1);
+  --color-secondary: var(--secondary, #f43f5e);
   --color-accent: #10b981;
   --color-warning: #f59e0b;
-  --color-slate-800: #1e293b;
-  --color-bg: #fdfdfd;
+  --color-main: var(--text, #1e293b);
+  --color-muted: var(--text-muted, #64748b);
+  --color-bg: var(--bg, #fdfdfd);
+  --color-card: var(--card-bg, #ffffff);
+  --color-border: var(--border-color, #eef2ff);
+  --color-subtle: var(--subtle-bg, #f8fafc);
+}
+
+:root {
+  --brand: #6366f1;
+  --secondary: #f43f5e;
+  --bg: #fdfdfd;
+  --card-bg: #ffffff;
+  --subtle-bg: #f8fafc;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #eef2ff;
+  --shadow: rgba(99, 102, 241, 0.1);
+}
+
+[data-theme='dark-orange'] {
+  --brand: #f7971d;
+  --secondary: #ff4d4d;
+  --bg: #0a0a0a;
+  --card-bg: #141414;
+  --subtle-bg: #1a1a1a;
+  --text: #ffffff;
+  --text-muted: #999999;
+  --border-color: #262626;
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='dark'] {
+  --brand: #818cf8;
+  --secondary: #fb7185;
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --subtle-bg: #334155;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+  --shadow: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='white'] {
+  --brand: #1e293b;
+  --secondary: #64748b;
+  --bg: #ffffff;
+  --card-bg: #f8fafc;
+  --subtle-bg: #f1f5f9;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --shadow: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='white-blue'] {
+  --brand: #0ea5e9;
+  --secondary: #38bdf8;
+  --bg: #f0f9ff;
+  --card-bg: #ffffff;
+  --subtle-bg: #f0f9ff;
+  --text: #0c4a6e;
+  --text-muted: #64748b;
+  --border-color: #e0f2fe;
+  --shadow: rgba(14, 165, 233, 0.1);
 }
 
 @layer base {
   body {
-    @apply bg-bg text-slate-800;
+    @apply bg-bg text-main transition-colors duration-300;
+  }
+
+  /* Force theme colors on UI elements that were hardcoded */
+  aside, .bg-white, .theme-card, .theme-btn-outline {
+    @apply transition-colors duration-300;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-main;
   }
 }
 
 .theme-card {
-  @apply bg-white rounded-[32px] p-8 border border-indigo-50/50 shadow-[0_20px_50px_rgba(99,102,241,0.1)];
+  @apply bg-card rounded-[32px] p-8 border border-border shadow-[0_20px_50px_var(--shadow)];
 }
 
 .theme-btn-primary {
-  @apply bg-brand text-white rounded-[20px] font-bold px-8 py-4 shadow-[0_10px_20px_rgba(99,102,241,0.3)] hover:scale-105 transition-transform;
+  @apply bg-brand text-white rounded-[20px] font-bold px-8 py-4 shadow-[0_10px_20px_var(--shadow)] hover:scale-105 transition-transform;
 }
 
 .theme-btn-outline {
-  @apply bg-white border-2 border-slate-200 text-slate-500 rounded-[20px] font-bold px-8 py-4 hover:border-brand/30 transition-all;
+  @apply bg-card border-2 border-border text-muted rounded-[20px] font-bold px-8 py-4 hover:border-brand/30 transition-all;
 }
 
 .theme-input {
-  @apply w-full bg-slate-50 border border-slate-200 rounded-[20px] px-6 py-4 outline-none focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all;
+  @apply w-full bg-card border border-border rounded-[20px] px-6 py-4 outline-none text-main placeholder:text-muted focus:border-brand focus:ring-2 focus:ring-brand/10 transition-all;
+}
+
+/* Scrollbar theme consistency */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-bg;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full hover:bg-slate-400/30;
 }

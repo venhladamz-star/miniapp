@@ -106,6 +106,12 @@ const translations = {
     nav_download: 'Tải video',
     nav_powercut: 'Lịch cúp điện',
     nav_profile: 'Cá nhân',
+    theme_select: 'Giao diện',
+    theme_default: 'Mặc định',
+    theme_dark_orange: 'Cam Tối',
+    theme_dark: 'Tối',
+    theme_white: 'Trắng',
+    theme_white_blue: 'Trắng Xanh',
     hub_title: 'LifeHub v2.0',
     hub_desc: 'Trung tâm tiện ích đánh bóng cho hiệu quả hiện đại.',
     login_google: 'Đăng nhập Google',
@@ -185,6 +191,12 @@ const translations = {
     grid_report: 'Báo cáo lưới điện',
     evn_north: 'EVN Miền Bắc',
     evn_south: 'EVN Miền Nam',
+    theme_select: 'Chọn giao diện',
+    theme_default: 'Mặc định',
+    theme_dark_orange: 'Cam Tối',
+    theme_dark: 'Tối',
+    theme_white: 'Trắng',
+    theme_white_blue: 'Trắng Xanh',
     domain_capital: 'Khu vực Thủ đô/Miền Bắc',
     domain_metro: 'Khu vực Thành phố/Miền Nam',
     ai_food_prompt: (ing: string) => `Nguyên liệu đang có: ${ing}. Hãy gợi ý 3-5 món ăn ngon, kèm theo công thức ngắn gọn và lưu ý khi nấu. Trình bày bằng tiếng Việt, định dạng Markdown rõ ràng.`,
@@ -289,6 +301,12 @@ const translations = {
     download_notice: 'Note: Uses curated gateways for reliability.',
     personalize: 'Personalization',
     personalize_desc: 'Store information to auto-fill forms.',
+    theme_select: 'Interface',
+    theme_default: 'Default',
+    theme_dark_orange: 'Dark Orange',
+    theme_dark: 'Dark',
+    theme_white: 'White',
+    theme_white_blue: 'White Blue',
     full_name: 'Full Name',
     default_bank: 'Default Bank',
     save_info: 'Save Profile',
@@ -404,6 +422,12 @@ const translations = {
     download_notice: '注意：使用精心挑选的网关以确保可靠性。',
     personalize: '个性化',
     personalize_desc: '存储信息以自动填写表单。',
+    theme_select: '界面主题',
+    theme_default: '默认',
+    theme_dark_orange: '深橙',
+    theme_dark: '深色',
+    theme_white: '白色',
+    theme_white_blue: '白蓝',
     full_name: '姓名',
     default_bank: '默认银行',
     save_info: '保存个人资料',
@@ -473,6 +497,17 @@ export default function App() {
   const [lang, setLang] = useState<'vi' | 'en' | 'zh'>('vi');
   const [activeView, setActiveView] = useState('home');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState<string>(localStorage.getItem('app-theme') || 'default');
+
+  useEffect(() => {
+    if (theme === 'default') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    localStorage.setItem('app-theme', theme);
+  }, [theme]);
+
   const [profile, setProfile] = useState<UserProfile>({ name: '', bank: '', account: '' });
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -574,7 +609,7 @@ export default function App() {
   const currentTitle = views.find(v => v.id === activeView)?.title || '';
 
   return (
-    <div className="min-h-screen bg-bg text-slate-800 font-sans">
+    <div className="min-h-screen bg-bg text-main font-sans">
       {/* Background Blobs */}
       <div className="fixed top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
       <div className="fixed bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-secondary rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
@@ -593,32 +628,52 @@ export default function App() {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 bottom-0 w-[280px] bg-white border-r border-slate-100 z-[100] transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-6 border-b border-slate-50 flex items-center justify-between">
+      <aside className={`fixed left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border z-[100] transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 border-b border-border flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-black font-display cursor-pointer flex items-center bg-[#1a1a1a] rounded-lg px-3 py-1.5" onClick={() => setActiveView('home')}>
               <span className="text-white">Life</span>
               <span className="bg-[#f7971d] text-black px-1.5 py-0.5 rounded-md ml-1">hub</span>
             </h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 ml-1">Open-source Hub</p>
+            <p className="text-[10px] text-muted font-bold uppercase tracking-widest mt-1 ml-1">Open-source Hub</p>
           </div>
-          <div className="flex flex-col gap-1">
-            {(['vi', 'en', 'zh'] as const).map(l => (
-              <button 
-                key={l}
-                onClick={() => setLang(l)}
-                className={`text-[9px] font-black px-1.5 py-0.5 rounded border transition-all ${lang === l ? 'bg-brand text-white border-brand' : 'text-slate-300 border-slate-200 hover:border-brand/30'}`}
-              >
-                {l.toUpperCase()}
-              </button>
-            ))}
+          <div className="flex items-start gap-2">
+            <div className="flex flex-col gap-1">
+              {(['vi', 'en', 'zh'] as const).map(l => (
+                <button 
+                  key={l}
+                  onClick={(e) => { e.stopPropagation(); setLang(l); }}
+                  className={`text-[9px] font-black px-1.5 py-0.5 rounded border transition-all ${lang === l ? 'bg-brand text-white border-brand' : 'text-muted border-border hover:border-brand/30'}`}
+                >
+                  {l.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-col gap-1">
+              {[
+                { id: 'default', color: 'bg-[#6366f1]' },
+                { id: 'dark-orange', color: 'bg-[#f7971d]' },
+                { id: 'dark', color: 'bg-[#1e293b]' },
+                { id: 'white', color: 'bg-white border text-black' },
+                { id: 'white-blue', color: 'bg-[#0ea5e9]' }
+              ].map(tOpt => (
+                <button 
+                  key={tOpt.id}
+                  onClick={(e) => { e.stopPropagation(); setTheme(tOpt.id); }}
+                  className={`w-4 h-4 rounded-full transition-all flex items-center justify-center border ${theme === tOpt.id ? 'border-brand scale-110 shadow-sm' : 'border-border hover:border-indigo-200'} ${tOpt.color}`}
+                  title={tOpt.id}
+                >
+                  {theme === tOpt.id && <div className="w-1 h-1 rounded-full bg-white shadow-sm" />}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         
         <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
           {!user ? (
-            <div className="px-4 py-6 mb-4 bg-indigo-50/50 rounded-3xl border border-indigo-100 flex flex-col items-center gap-4">
-              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest text-center">{t('cloud_disabled')}</p>
+            <div className="px-4 py-6 mb-4 bg-brand/5 rounded-3xl border border-border flex flex-col items-center gap-4">
+              <p className="text-[10px] font-black text-brand uppercase tracking-widest text-center">{t('cloud_disabled')}</p>
               <button 
                 onClick={handleSignIn}
                 className="theme-btn-primary w-full py-3 text-xs flex items-center justify-center gap-2"
@@ -627,21 +682,21 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <div className="px-4 py-4 mb-4 bg-indigo-50/20 rounded-3xl border border-indigo-100/50 flex items-center gap-3">
-              <img src={user.photoURL || ''} className="w-10 h-10 rounded-2xl border-2 border-white shadow-sm" alt="Avatar" />
+            <div className="px-4 py-4 mb-4 bg-subtle rounded-3xl border border-border flex items-center gap-3">
+              <img src={user.photoURL || ''} className="w-10 h-10 rounded-2xl border-2 border-card shadow-sm" alt="Avatar" />
               <div className="overflow-hidden">
-                <p className="text-xs font-black text-slate-800 truncate">{user.displayName}</p>
+                <p className="text-xs font-black text-main truncate">{user.displayName}</p>
                 <button onClick={logout} className="text-[10px] font-black text-secondary uppercase tracking-widest hover:underline">{t('logout')}</button>
               </div>
             </div>
           )}
           
-          <p className="px-4 py-2 text-[10px] text-slate-400 uppercase tracking-widest font-black">{t('toolbox')}</p>
+          <p className="px-4 py-2 text-[10px] text-muted uppercase tracking-widest font-black">{t('toolbox')}</p>
           {views.map(view => (
             <button
               key={view.id}
               onClick={() => { setActiveView(view.id); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${activeView === view.id ? 'bg-brand/10 text-brand' : 'text-slate-500 hover:bg-slate-50'}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${activeView === view.id ? 'bg-brand/10 text-brand' : 'text-muted hover:bg-subtle'}`}
             >
               {view.icon}
               <span className="text-sm font-bold">{view.title}</span>
@@ -653,11 +708,11 @@ export default function App() {
       {/* Main Content */}
       <main className="md:ml-[280px]">
         {/* Header */}
-        <header className="fixed top-0 right-0 left-0 md:left-[280px] h-[64px] bg-bg/80 backdrop-blur-xl border-b border-slate-100 z-50 flex items-center px-4 md:px-6">
-          <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 -ml-2 text-slate-800 hover:bg-slate-100 rounded-lg">
+        <header className="fixed top-0 right-0 left-0 md:left-[280px] h-[64px] bg-bg/80 backdrop-blur-xl border-b border-border z-50 flex items-center px-4 md:px-6">
+          <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 -ml-2 text-main hover:bg-subtle rounded-lg">
             <Menu size={24} />
           </button>
-          <div className="ml-4 md:ml-0 bg-indigo-50 text-brand px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest truncate max-w-[120px] md:max-w-none">
+          <div className="ml-4 md:ml-0 bg-brand/5 text-brand px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest truncate max-w-[120px] md:max-w-none">
             {currentTitle}
           </div>
           <div className="ml-auto flex items-center gap-2">
@@ -666,7 +721,7 @@ export default function App() {
                  {t('login_google')}
                </button>
             ) : (
-               <img src={user.photoURL || ''} className="w-8 h-8 rounded-xl border border-white shadow-sm md:hidden" alt="User" />
+               <img src={user.photoURL || ''} className="w-8 h-8 rounded-xl border border-card shadow-sm md:hidden" alt="User" />
             )}
           </div>
         </header>
@@ -705,7 +760,7 @@ export default function App() {
                 {activeView === 'search' && <SearchView t={t} />}
                 {activeView === 'powercut' && <PowerCutView t={t} />}
                 {activeView === 'profile' && (
-                  user ? <ProfileView profile={profile} onSave={saveProfile} t={t} /> : (
+                  user ? <ProfileView profile={profile} onSave={saveProfile} t={t} theme={theme} setTheme={setTheme} /> : (
                     <div className="text-center py-24">
                       <Wand2 size={64} className="mx-auto text-slate-200 mb-6" />
                       <h3 className="text-2xl font-black text-slate-400">{t('auth_required')}</h3>
@@ -763,9 +818,9 @@ function HomeView({ onNavigate, t }: { onNavigate: (v: string) => void, t: any }
         <h1 className="text-5xl md:text-7xl font-black font-display tracking-tight mb-4 flex items-center justify-center md:justify-start gap-2">
           <span className="bg-[#1a1a1a] text-white px-4 py-2 rounded-3xl">Life</span>
           <span className="bg-[#f7971d] text-black px-4 py-2 rounded-3xl">hub</span>
-          <span className="text-slate-200 text-3xl md:text-4xl grow-0 shrink-0 ml-2 italic">v2.0</span>
+          <span className="text-muted text-3xl md:text-4xl grow-0 shrink-0 ml-2 italic">v2.0</span>
         </h1>
-        <p className="text-slate-500 text-xl font-medium max-w-2xl">
+        <p className="text-muted text-xl font-medium max-w-2xl">
           {t('hub_desc')}
         </p>
       </div>
@@ -781,7 +836,7 @@ function HomeView({ onNavigate, t }: { onNavigate: (v: string) => void, t: any }
               {card.icon}
             </div>
             <h3 className="text-xl font-bold font-display mb-2">{card.title}</h3>
-            <p className="text-sm text-slate-400 font-medium">{card.desc}</p>
+            <p className="text-sm text-muted font-medium">{card.desc}</p>
           </button>
         ))}
         <button 
@@ -792,7 +847,7 @@ function HomeView({ onNavigate, t }: { onNavigate: (v: string) => void, t: any }
             <Zap />
           </div>
           <h3 className="text-xl font-bold font-display mb-2">{t('nav_powercut')}</h3>
-          <p className="text-sm text-slate-400 font-medium">{t('evn_desc')}</p>
+          <p className="text-sm text-muted font-medium">{t('evn_desc')}</p>
         </button>
       </div>
     </div>
@@ -915,14 +970,14 @@ function BankView({ profile, user, t, lang }: { profile: UserProfile, user: User
 
   return (
     <div className="space-y-6">
-      <div className="flex bg-white/50 backdrop-blur-sm p-1.5 rounded-[24px] border border-slate-100 w-fit shadow-sm">
+      <div className="flex bg-card/50 backdrop-blur-sm p-1.5 rounded-[24px] border border-border w-fit shadow-sm">
         <button 
           onClick={() => setTab('debts')}
-          className={`px-8 py-3 rounded-[18px] text-sm font-bold transition-all ${tab === 'debts' ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`px-8 py-3 rounded-[18px] text-sm font-bold transition-all ${tab === 'debts' ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'text-muted hover:text-main'}`}
         >{t('tab_debt')}</button>
         <button 
           onClick={() => setTab('qr')}
-          className={`px-8 py-3 rounded-[18px] text-sm font-bold transition-all ${tab === 'qr' ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`px-8 py-3 rounded-[18px] text-sm font-bold transition-all ${tab === 'qr' ? 'bg-brand text-white shadow-lg shadow-brand/20' : 'text-muted hover:text-main'}`}
         >{t('tab_qr')}</button>
       </div>
 
@@ -990,23 +1045,23 @@ function BankView({ profile, user, t, lang }: { profile: UserProfile, user: User
           <div className="lg:col-span-2">
             <div className="space-y-4">
               {debts.length === 0 ? (
-                <div className="text-center py-24 bg-white/50 rounded-[32px] border border-dashed border-slate-200">
-                  <Wallet size={48} className="mx-auto text-slate-200 mb-6" />
-                  <p className="text-slate-400 font-bold">{t('registry_empty')}</p>
+                <div className="text-center py-24 bg-card/50 rounded-[32px] border border-dashed border-border">
+                  <Wallet size={48} className="mx-auto text-muted mb-6 opacity-20" />
+                  <p className="text-muted font-bold">{t('registry_empty')}</p>
                 </div>
               ) : (
                 debts.map(debt => (
-                  <div key={debt.id} className="p-6 bg-white border border-slate-100 rounded-[32px] flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
+                  <div key={debt.id} className="p-6 bg-card border border-border rounded-[32px] flex items-center justify-between shadow-sm transition-all hover:bg-subtle">
                     <div className="flex items-center gap-6">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg shadow-indigo-100 ${debt.type === 'cho_vay' ? 'bg-brand/10 text-brand' : 'bg-secondary/10 text-secondary'}`}>
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg border border-border ${debt.type === 'cho_vay' ? 'bg-brand/10 text-brand' : 'bg-secondary/10 text-secondary'}`}>
                         {debt.type === 'cho_vay' ? '▲' : '▼'}
                       </div>
                       <div>
                         <div className="flex items-center gap-3">
-                          <h4 className="font-black text-lg text-slate-800">{debt.person}</h4>
-                          <span className="text-[10px] bg-slate-100 px-3 py-1 rounded-full font-black text-slate-400 uppercase tracking-tighter">{debt.date}</span>
+                          <h4 className="font-black text-lg text-main">{debt.person}</h4>
+                          <span className="text-[10px] bg-subtle px-3 py-1 rounded-full font-black text-muted uppercase tracking-tighter">{debt.date}</span>
                         </div>
-                        <p className="text-sm font-medium text-slate-400 mt-1">{debt.note || t('no_metadata')}</p>
+                        <p className="text-sm font-medium text-muted mt-1">{debt.note || t('no_metadata')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-6">
@@ -1015,7 +1070,7 @@ function BankView({ profile, user, t, lang }: { profile: UserProfile, user: User
                       </div>
                       <button 
                         onClick={() => deleteDebt(debt.id)}
-                        className="p-3 text-slate-300 hover:text-secondary hover:bg-secondary/5 rounded-2xl transition-all"
+                        className="p-3 text-muted hover:text-secondary hover:bg-secondary/5 rounded-2xl transition-all"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -1083,11 +1138,11 @@ function BankView({ profile, user, t, lang }: { profile: UserProfile, user: User
           </div>
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
             {qrs.length === 0 ? (
-               <div className="col-span-full text-center py-24 bg-white/50 rounded-[40px] border-4 border-dashed border-slate-100 flex flex-col items-center justify-center">
-                  <div className="w-20 h-20 bg-slate-50 text-slate-200 rounded-[24px] flex items-center justify-center mb-6">
+               <div className="col-span-full text-center py-24 bg-card/50 rounded-[40px] border-4 border-dashed border-border flex flex-col items-center justify-center">
+                  <div className="w-20 h-20 bg-subtle text-muted rounded-[24px] flex items-center justify-center mb-6 opacity-30">
                     <QrCode size={40} />
                   </div>
-                  <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">{t('no_crypto')}</p>
+                  <p className="text-muted font-black uppercase tracking-widest text-[10px]">{t('no_crypto')}</p>
                </div>
             ) : (
                 qrs.map(qr => (
@@ -1691,9 +1746,9 @@ function DownloadView({ t }: { t: any }) {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
-      <div className="theme-card text-center bg-indigo-50/30 border-indigo-100">
+      <div className="theme-card text-center bg-brand/5 border-border">
         <h3 className="text-3xl font-black mb-4 font-display text-brand">{t('asset_acq')}</h3>
-        <p className="text-slate-500 text-sm mb-8 font-medium">{t('asset_desc')}</p>
+        <p className="text-muted text-sm mb-8 font-medium">{t('asset_desc')}</p>
         <div className="flex gap-3">
           <input 
             className="theme-input flex-1"
@@ -1712,21 +1767,21 @@ function DownloadView({ t }: { t: any }) {
             href={`https://${p.site}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-8 bg-white border border-slate-100 rounded-[32px] flex items-center justify-between hover:border-brand shadow-sm hover:shadow-indigo-100/50 transition-all group"
+            className="p-8 bg-card border border-border rounded-[32px] flex items-center justify-between hover:border-brand shadow-sm transition-all group"
           >
             <div className="flex items-center gap-6">
                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-lg ${p.color}`}>{p.icon}</div>
                <div>
-                  <div className="font-black text-slate-800">{p.name}</div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{p.site}</div>
+                  <div className="font-black text-main">{p.name}</div>
+                  <div className="text-[10px] text-muted font-bold uppercase tracking-widest">{p.site}</div>
                </div>
             </div>
-            <ExternalLink size={20} className="text-slate-300 group-hover:text-brand transition-colors" />
+            <ExternalLink size={20} className="text-muted group-hover:text-brand transition-colors" />
           </a>
         ))}
       </div>
       
-      <div className="p-8 bg-indigo-50 rounded-[32px] border border-indigo-100/50 text-center">
+      <div className="p-8 bg-brand/5 rounded-[32px] border border-border text-center">
         <p className="text-xs text-brand font-black italic uppercase tracking-tighter">
           {t('download_notice')}
         </p>
@@ -1735,23 +1790,47 @@ function DownloadView({ t }: { t: any }) {
   );
 }
 
-function ProfileView({ profile, onSave, t }: { profile: UserProfile, onSave: (p: UserProfile) => void, t: any }) {
+function ProfileView({ profile, onSave, t, theme, setTheme }: { profile: UserProfile, onSave: (p: UserProfile) => void, t: any, theme: string, setTheme: (s: string) => void }) {
   const [form, setForm] = useState(profile);
+
+  const themeOptions = [
+    { id: 'default', label: t('theme_default'), color: 'bg-[#6366f1]' },
+    { id: 'dark-orange', label: t('theme_dark_orange'), color: 'bg-[#f7971d]' },
+    { id: 'dark', label: t('theme_dark'), color: 'bg-[#1e293b]' },
+    { id: 'white', label: t('theme_white'), color: 'bg-white border' },
+    { id: 'white-blue', label: t('theme_white_blue'), color: 'bg-[#0ea5e9]' },
+  ];
 
   return (
     <div className="max-w-xl mx-auto space-y-10">
       <div className="text-center">
-        <div className="w-24 h-24 bg-brand/10 text-brand rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-brand/5">
+        <div className="w-24 h-24 bg-brand/10 text-brand rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-brand/5 transition-colors">
           <Wand2 size={40} />
         </div>
-        <h3 className="text-3xl font-black font-display text-brand tracking-tight">{t('personalize')}</h3>
-        <p className="text-slate-500 font-medium mt-2">{t('personalize_desc')}</p>
+        <h3 className="text-3xl font-black font-display text-brand tracking-tight transition-colors">{t('personalize')}</h3>
+        <p className="text-muted font-medium mt-2">{t('personalize_desc')}</p>
+      </div>
+
+      <div className="theme-card">
+        <label className="block text-[10px] font-black text-muted uppercase tracking-widest mb-6 ml-1">{t('theme_select')}</label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {themeOptions.map((opt) => (
+            <button
+              key={opt.id}
+              onClick={() => setTheme(opt.id)}
+              className={`p-4 rounded-3xl flex flex-col items-center gap-3 transition-all border-2 ${theme === opt.id ? 'border-brand bg-brand/5 shadow-lg' : 'border-border bg-subtle hover:border-brand/20'}`}
+            >
+              <div className={`w-8 h-8 rounded-2xl shadow-sm ${opt.color}`} />
+              <span className={`text-[10px] font-black uppercase tracking-wider ${theme === opt.id ? 'text-brand' : 'text-muted'}`}>{opt.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="theme-card space-y-6">
         <div className="space-y-4">
           <div>
-            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 ml-1">{t('full_name')}</label>
+            <label className="block text-[10px] font-black text-muted uppercase tracking-widest mb-2 ml-1">{t('full_name')}</label>
             <input 
               className="theme-input w-full"
               placeholder="NGUYEN VAN A"
@@ -1760,7 +1839,7 @@ function ProfileView({ profile, onSave, t }: { profile: UserProfile, onSave: (p:
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 ml-1">{t('default_bank')}</label>
+            <label className="block text-[10px] font-black text-muted uppercase tracking-widest mb-2 ml-1">{t('default_bank')}</label>
             <input 
               className="theme-input w-full"
               placeholder="MB Bank, VCB..."
@@ -1871,8 +1950,8 @@ function PowerCutView({ t }: { t: any }) {
           <a href="https://evnhanoi.vn/search/power-cut" target="_blank" className="text-xs font-black text-brand hover:underline">Access Terminal →</a>
         </div>
         <div className="theme-card">
-          <h5 className="font-black text-slate-800 mb-2 flex items-center gap-3"><Zap size={18} className="text-warning" /> {t('evn_south')}</h5>
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-4">{t('domain_metro')}</p>
+          <h5 className="font-black text-main mb-2 flex items-center gap-3"><Zap size={18} className="text-warning" /> {t('evn_south')}</h5>
+          <p className="text-xs text-muted font-bold uppercase tracking-widest mb-4">{t('domain_metro')}</p>
           <a href="https://www.evnhcmc.vn/khach-hang/lich-ngung-giam-cung-cap-dien" target="_blank" className="text-xs font-black text-brand hover:underline">Access Terminal →</a>
         </div>
       </div>
@@ -2004,9 +2083,9 @@ function LunarView({ t }: { t: any }) {
             <div 
                 key={d} 
                 onClick={() => fetchLunarAI(dateObj)}
-                className={`cursor-pointer group relative flex flex-col items-center justify-center p-1 sm:p-2 rounded-[10px] md:rounded-2xl transition-all aspect-square border overflow-hidden ${isToday ? 'bg-brand text-white shadow-md shadow-brand/20 border-brand hover:bg-indigo-500' : 'bg-slate-50 border-slate-100 hover:border-brand/30 hover:bg-white '} ${!isToday && info.holiday ? 'bg-rose-50/50 border-rose-100' : ''}`}
+                className={`cursor-pointer group relative flex flex-col items-center justify-center p-1 sm:p-2 rounded-[10px] md:rounded-2xl transition-all aspect-square border overflow-hidden ${isToday ? 'bg-brand text-white shadow-md shadow-brand/20 border-brand hover:bg-indigo-500' : 'bg-subtle border-border hover:border-brand/30 hover:bg-card '} ${!isToday && info.holiday ? 'bg-rose-50/50 border-rose-100' : ''}`}
             >
-                <div className={`text-lg sm:text-xl md:text-2xl font-black z-10 ${info.holiday ? 'mt-1 md:mt-2' : ''} ${isToday ? 'text-white' : (info.holiday ? 'text-rose-600' : 'text-slate-700')}`}>
+                <div className={`text-lg sm:text-xl md:text-2xl font-black z-10 ${info.holiday ? 'mt-1 md:mt-2' : ''} ${isToday ? 'text-white' : (info.holiday ? 'text-rose-600' : 'text-main')}`}>
                     {d}
                 </div>
                 <div className={`text-[8.5px] sm:text-[10px] md:text-xs font-bold leading-tight mt-0.5 z-10 ${isToday ? 'text-white/80' : 'text-brand'}`}>
@@ -2027,11 +2106,11 @@ function LunarView({ t }: { t: any }) {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-      <div className="bg-white/80 backdrop-blur-xl border border-indigo-100 rounded-[32px] md:rounded-[40px] p-4 sm:p-6 md:p-10 shadow-sm flex flex-col">
-         <div className="w-full flex items-center justify-between mb-6 md:mb-10 pb-4 md:pb-6 border-b border-slate-100">
+      <div className="bg-card/80 backdrop-blur-xl border border-border rounded-[32px] md:rounded-[40px] p-4 sm:p-6 md:p-10 shadow-sm flex flex-col">
+         <div className="w-full flex items-center justify-between mb-6 md:mb-10 pb-4 md:pb-6 border-b border-border">
             <button 
                 onClick={handlePrevMonth}
-                className="w-10 h-10 md:w-12 md:h-12 flex justify-center items-center rounded-[10px] md:rounded-2xl bg-slate-50 text-slate-400 hover:text-brand hover:bg-brand/10 transition-all font-black text-lg md:text-xl"
+                className="w-10 h-10 md:w-12 md:h-12 flex justify-center items-center rounded-[10px] md:rounded-2xl bg-subtle text-muted hover:text-brand hover:bg-brand/10 transition-all font-black text-lg md:text-xl"
             >
                 -
             </button>
@@ -2042,13 +2121,13 @@ function LunarView({ t }: { t: any }) {
                 >
                     {t('lunar_today')}
                 </button>
-                <h4 className="text-xl md:text-2xl font-black text-slate-800 capitalize">
+                <h4 className="text-xl md:text-2xl font-black text-main capitalize">
                    Tháng {month + 1}, {year}
                 </h4>
             </div>
             <button 
                 onClick={handleNextMonth}
-                className="w-10 h-10 md:w-12 md:h-12 flex justify-center items-center rounded-[10px] md:rounded-2xl bg-slate-50 text-slate-400 hover:text-brand hover:bg-brand/10 transition-all font-black text-lg md:text-xl"
+                className="w-10 h-10 md:w-12 md:h-12 flex justify-center items-center rounded-[10px] md:rounded-2xl bg-subtle text-muted hover:text-brand hover:bg-brand/10 transition-all font-black text-lg md:text-xl"
             >
                 +
             </button>
@@ -2056,7 +2135,7 @@ function LunarView({ t }: { t: any }) {
 
          <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4 w-full">
              {dayNames.map(day => (
-                 <div key={day} className="text-center text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                 <div key={day} className="text-center text-[10px] md:text-xs font-black text-muted uppercase tracking-widest mb-2">
                      {day}
                  </div>
              ))}
