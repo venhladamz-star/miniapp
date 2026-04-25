@@ -206,6 +206,7 @@ const translations = {
     ai_lunar_system: 'Bạn là chuyên gia tử vi và phong thủy văn hóa phương Đông cổ.',
     lunar_details: 'Chi Tiết Ngày Tốt Xấu',
     analyzing: 'Đang thỉnh vấn AI...',
+    error_rate_limit: 'AI đang bận hoặc hết lượt dùng thử. Vui lòng quay lại sau vài phút.',
     search_explore: 'Khám phá thế giới',
     search_desc: 'Tìm kiếm địa điểm, quán ăn và thông tin từ Google.',
     google_search: 'Tìm kiếm Google',
@@ -327,6 +328,7 @@ const translations = {
     ai_lunar_system: 'You are a Feng Shui and Eastern Astrology grandmaster.',
     lunar_details: 'Auspicious Details',
     analyzing: 'Consulting AI...',
+    error_rate_limit: 'AI is busy or rate limited. Please try again in a few minutes.',
     search_explore: 'Explore the World',
     search_desc: 'Find places, food, and info from Google ecosystem.',
     google_search: 'Google Search',
@@ -448,6 +450,7 @@ const translations = {
     ai_lunar_system: '你是一位精通风水和东方命理的大师。',
     lunar_details: '吉凶详情',
     analyzing: '正在咨询 AI...',
+    error_rate_limit: 'AI 繁忙或已达到频率限制。请几分钟后再试。',
     search_explore: '探索世界',
     search_desc: '从谷歌生态系统中寻找地点、美食和信息。',
     google_search: '谷歌搜索',
@@ -1272,10 +1275,10 @@ function FoodView({ t }: { t: any }) {
       setResult(response.data.choices[0].message.content || t('no_metadata'));
     } catch (e: any) {
       console.error("AI Error:", e);
-      if (e.response?.status === 401) {
+      if (e.response?.status === 429) {
+        setResult(`⚠️ ${t('error_rate_limit')}`);
+      } else if (e.response?.status === 401) {
         setResult("⚠️ Unauthorized: Your API key for " + model + " seems invalid or expired.");
-      } else if (e.response?.status === 429) {
-        setResult("⚠️ " + (e.response?.data?.error || "Rate limit reached. Please wait a moment."));
       } else if (e.response?.status === 524 || e.response?.status === 504 || e.code === 'ECONNABORTED') {
         setResult("⚠️ AI Timeout: Server took too long to respond. The AI might be overloaded, please try again with simpler ingredients.");
       } else if (e.response?.status >= 500) {
@@ -1985,7 +1988,12 @@ function LunarView({ t }: { t: any }) {
         });
         setSelectedDateMsg({ date, info: response.data.choices[0].message.content });
     } catch (e: any) {
-        setAiError(e.response?.data?.error?.message || e.message);
+        console.error("Lunar AI Error:", e);
+        if (e.response?.status === 429) {
+            setAiError(`⚠️ ${t('error_rate_limit')}`);
+        } else {
+            setAiError(`⚠️ ${e.response?.data?.error?.message || e.message}`);
+        }
     } finally {
         setAiLoading(false);
     }
