@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -12,7 +12,10 @@ const googleProvider = new GoogleAuthProvider();
 if (firebaseConfig && (firebaseConfig as any).apiKey) {
   try {
     app = initializeApp(firebaseConfig);
-    db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
+    db = initializeFirestore(app, {
+      experimentalForceLongPolling: true,
+      localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
+    }, (firebaseConfig as any).firestoreDatabaseId);
     auth = getAuth(app);
   } catch (e) {
     console.error("Firebase init error:", e);

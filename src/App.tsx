@@ -191,12 +191,6 @@ const translations = {
     grid_report: 'Báo cáo lưới điện',
     evn_north: 'EVN Miền Bắc',
     evn_south: 'EVN Miền Nam',
-    theme_select: 'Chọn giao diện',
-    theme_default: 'Mặc định',
-    theme_dark_orange: 'Cam Tối',
-    theme_dark: 'Tối',
-    theme_white: 'Trắng',
-    theme_white_blue: 'Trắng Xanh',
     domain_capital: 'Khu vực Thủ đô/Miền Bắc',
     domain_metro: 'Khu vực Thành phố/Miền Nam',
     ai_food_prompt: (ing: string) => `Nguyên liệu đang có: ${ing}. Hãy gợi ý 3-5 món ăn ngon, kèm theo công thức ngắn gọn và lưu ý khi nấu. Trình bày bằng tiếng Việt, định dạng Markdown rõ ràng.`,
@@ -1337,16 +1331,23 @@ function FoodView({ t }: { t: any }) {
       </div>
 
       {result && (
-        <div className="mt-8 relative overflow-hidden bg-white/80 backdrop-blur-xl border border-indigo-100 rounded-[32px] p-6 shadow-sm">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8 relative overflow-hidden theme-card p-6 md:p-10"
+        >
            <div className="absolute top-0 right-0 p-8 text-brand/5 pointer-events-none">
-             <Utensils size={100} />
+             <Utensils size={150} />
            </div>
-           <div className="prose prose-sm md:prose-base prose-indigo max-w-none text-slate-700 relative z-10 
+           <div className="relative z-10 prose prose-sm md:prose-base max-w-none 
               prose-headings:text-brand prose-headings:font-black prose-headings:tracking-tight
-              prose-strong:text-indigo-900 prose-ul:font-medium prose-p:font-medium">
+              prose-p:text-main prose-p:font-medium prose-p:leading-relaxed
+              prose-strong:text-brand prose-strong:font-bold
+              prose-li:text-main prose-li:font-medium
+              prose-ul:my-4 prose-li:my-1">
              <ReactMarkdown>{result}</ReactMarkdown>
            </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
@@ -2151,16 +2152,16 @@ function LunarView({ t }: { t: any }) {
                       initial={{ opacity: 0, scale: 0.95, y: 20 }} 
                       animate={{ opacity: 1, scale: 1, y: 0 }} 
                       exit={{ opacity: 0, scale: 0.95, y: 20 }} 
-                      className="bg-white rounded-[32px] p-6 md:p-8 w-full max-w-lg relative z-10 shadow-2xl max-h-[85vh] flex flex-col"
+                      className="bg-card rounded-[32px] p-6 md:p-8 w-full max-w-lg relative z-10 shadow-2xl max-h-[85vh] flex flex-col border border-border"
                   >
-                      <button onClick={() => setSelectedDateMsg(null)} className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-colors">
+                      <button onClick={() => setSelectedDateMsg(null)} className="absolute top-4 right-4 p-2 text-muted hover:text-main hover:bg-subtle rounded-full transition-colors">
                           <X size={20} />
                       </button>
                       
                       <h4 className="text-xl md:text-2xl font-black text-brand mb-4 flex items-center gap-2">
                           <Wand2 size={24} /> {t('lunar_details')}
                       </h4>
-                      <p className="font-bold text-slate-800 mb-6 bg-slate-100 py-2 px-4 rounded-xl inline-block max-w-max text-sm">
+                      <p className="font-bold text-main mb-6 bg-subtle py-2 px-4 rounded-xl inline-block max-w-max text-sm">
                           {selectedDateMsg.date.getDate()}/{selectedDateMsg.date.getMonth() + 1}/{selectedDateMsg.date.getFullYear()}
                       </p>
                       
