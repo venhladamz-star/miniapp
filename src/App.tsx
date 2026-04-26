@@ -25,7 +25,10 @@ import {
   Info,
   MapPin,
   Droplets,
-  Wind
+  Wind,
+  Smartphone,
+  Tablet,
+  Laptop
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import axios from 'axios';
@@ -217,6 +220,13 @@ const translations = {
     model_deepseek: 'DeepSeek (Beeknoee)',
     model_mistral: 'Mistral AI',
     select_model: 'Chọn mô hình AI',
+    select_device: 'Tối ưu trải nghiệm',
+    device_desc: 'Hãy chọn thiết bị bạn đang sử dụng để chúng tôi tối ưu giao diện tốt nhất cho bạn.',
+    device_phone: 'Điện thoại',
+    device_tablet: 'Máy tính bảng',
+    device_laptop: 'Máy tính / Laptop',
+    confirm: 'Xác nhận và bắt đầu',
+    change_layout: 'Đổi thiết bị',
   },
   en: {
     nav_home: 'Home',
@@ -339,6 +349,13 @@ const translations = {
     model_deepseek: 'DeepSeek (Beeknoee)',
     model_mistral: 'Mistral AI',
     select_model: 'Select AI Model',
+    select_device: 'Optimize Experience',
+    device_desc: 'Please select the device you are using so we can optimize the interface for you.',
+    device_phone: 'Smartphone',
+    device_tablet: 'Tablet',
+    device_laptop: 'Laptop / Desktop',
+    confirm: 'Confirm and Start',
+    change_layout: 'Change View',
   },
   zh: {
     nav_home: '首页',
@@ -461,6 +478,13 @@ const translations = {
     model_deepseek: 'DeepSeek (Beeknoee)',
     model_mistral: 'Mistral AI',
     select_model: '选择 AI 模型',
+    select_device: '优化体验',
+    device_desc: '请选择您正在使用的设备，以便我们为您优化界面。',
+    device_phone: '手机',
+    device_tablet: '平板电脑',
+    device_laptop: '笔记本/电脑',
+    confirm: '确认并开始',
+    change_layout: '更改布局',
   }
 };
 
@@ -495,6 +519,15 @@ export default function App() {
   const [activeView, setActiveView] = useState('home');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState<string>(localStorage.getItem('app-theme') || 'default');
+  const [deviceType, setDeviceType] = useState<string | null>(localStorage.getItem('device-preference'));
+
+  useEffect(() => {
+    if (deviceType) {
+      localStorage.setItem('device-preference', deviceType);
+    } else {
+      localStorage.removeItem('device-preference');
+    }
+  }, [deviceType]);
 
   useEffect(() => {
     if (theme === 'default') {
@@ -605,9 +638,61 @@ export default function App() {
 
   const currentTitle = views.find(v => v.id === activeView)?.title || '';
 
+  if (!deviceType) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-card w-full max-w-lg rounded-[40px] border border-border p-8 md:p-12 shadow-2xl relative overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 p-12 text-brand opacity-5 scale-150 rotate-12 pointer-events-none">
+            <LayoutDashboard size={200} />
+          </div>
+          
+          <div className="relative z-10">
+            <h2 className="text-4xl font-black font-display text-brand mb-4 tracking-tight">{t('select_device')}</h2>
+            <p className="text-muted font-medium mb-10 leading-relaxed">{t('device_desc')}</p>
+            
+            <div className="grid grid-cols-1 gap-4 mb-10">
+              {[
+                { id: 'phone', icon: <Smartphone size={24} />, label: t('device_phone'), desc: 'Optimized for 16:9 vertical navigation' },
+                { id: 'tablet', icon: <Tablet size={24} />, label: t('device_tablet'), desc: 'Hybrid layout with medium scaling' },
+                { id: 'laptop', icon: <Laptop size={24} />, label: t('device_laptop'), desc: 'Full-width dashboard productivity mode' }
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setDeviceType(opt.id)}
+                  className="group flex items-center gap-6 p-6 rounded-3xl border-2 border-border bg-subtle hover:border-brand hover:bg-brand/5 transition-all text-left"
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-white shadow-lg flex items-center justify-center text-brand group-hover:scale-110 transition-transform">
+                    {opt.icon}
+                  </div>
+                  <div>
+                    <div className="font-black text-main text-lg">{opt.label}</div>
+                    <div className="text-xs text-muted font-medium mt-0.5">{opt.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  const containerScales: Record<string, string> = {
+    phone: 'max-w-md mx-auto shadow-2xl border-x border-border min-h-screen bg-bg relative',
+    tablet: 'max-w-3xl mx-auto shadow-xl border-x border-border min-h-screen bg-bg relative',
+    laptop: 'min-h-screen bg-bg'
+  };
+
+  const scaleClasses = deviceType === 'laptop' ? '' : 'transform-gpu';
+
   return (
-    <div className="min-h-screen bg-bg text-main font-sans">
-      {/* Background Blobs */}
+    <div className={`min-h-screen bg-slate-900 flex justify-center items-center overflow-x-hidden ${scaleClasses}`}>
+      <div className={`${containerScales[deviceType]} w-full`}>
+        {/* Background Blobs */}
       <div className="fixed top-[-100px] right-[-100px] w-[500px] h-[500px] bg-brand rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
       <div className="fixed bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-secondary rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
 
@@ -619,13 +704,13 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 bg-black/60 z-[99] md:hidden"
+            className={`fixed inset-0 bg-black/60 z-[99] ${deviceType === 'laptop' ? 'md:hidden' : ''}`}
           />
         )}
       </AnimatePresence>
 
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border z-[100] transition-transform duration-300 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed left-0 top-0 bottom-0 w-[280px] bg-card border-r border-border z-[100] transition-transform duration-300 ${deviceType === 'laptop' ? 'translate-x-0' : (isSidebarOpen ? 'translate-x-0' : '-translate-x-full')}`}>
         <div className="p-6 border-b border-border flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-black font-display cursor-pointer flex items-center bg-[#1a1a1a] rounded-lg px-3 py-1.5" onClick={() => setActiveView('home')}>
@@ -703,10 +788,10 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="md:ml-[280px]">
+      <main className={`${deviceType === 'laptop' ? 'md:ml-[280px]' : ''}`}>
         {/* Header */}
-        <header className="fixed top-0 right-0 left-0 md:left-[280px] h-[64px] bg-bg/80 backdrop-blur-xl border-b border-border z-50 flex items-center px-4 md:px-6">
-          <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 -ml-2 text-main hover:bg-subtle rounded-lg">
+        <header className={`fixed top-0 right-0 left-0 ${deviceType === 'laptop' ? 'md:left-[280px]' : 'left-0'} h-[64px] bg-bg/80 backdrop-blur-xl border-b border-border z-50 flex items-center px-4 md:px-6`}>
+          <button onClick={() => setSidebarOpen(true)} className={`${deviceType === 'laptop' ? 'md:hidden' : ''} p-2 -ml-2 text-main hover:bg-subtle rounded-lg`}>
             <Menu size={24} />
           </button>
           <div className="ml-4 md:ml-0 bg-brand/5 text-brand px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest truncate max-w-[120px] md:max-w-none">
@@ -757,7 +842,7 @@ export default function App() {
                 {activeView === 'search' && <SearchView t={t} />}
                 {activeView === 'powercut' && <PowerCutView t={t} />}
                 {activeView === 'profile' && (
-                  user ? <ProfileView profile={profile} onSave={saveProfile} t={t} theme={theme} setTheme={setTheme} /> : (
+                  user ? <ProfileView profile={profile} onSave={saveProfile} t={t} theme={theme} setTheme={setTheme} setDeviceType={setDeviceType} /> : (
                     <div className="text-center py-24">
                       <Wand2 size={64} className="mx-auto text-slate-200 mb-6" />
                       <h3 className="text-2xl font-black text-slate-400">{t('auth_required')}</h3>
@@ -773,7 +858,7 @@ export default function App() {
       </main>
 
       {/* Bottom Navigation for Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-100 px-2 py-3 z-[100] md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.02)]">
+      <nav className={`fixed bottom-0 left-0 right-0 bg-bg/80 backdrop-blur-xl border-t border-border px-2 py-3 z-[100] shadow-lg ${deviceType === 'phone' ? '' : 'hidden'}`}>
         <div className="flex items-center justify-around">
           {bottomViews.map(view => (
             <button
@@ -792,6 +877,7 @@ export default function App() {
           </button>
         </div>
       </nav>
+      </div>
     </div>
   );
 }
@@ -1794,7 +1880,7 @@ function DownloadView({ t }: { t: any }) {
   );
 }
 
-function ProfileView({ profile, onSave, t, theme, setTheme }: { profile: UserProfile, onSave: (p: UserProfile) => void, t: any, theme: string, setTheme: (s: string) => void }) {
+function ProfileView({ profile, onSave, t, theme, setTheme, setDeviceType }: { profile: UserProfile, onSave: (p: UserProfile) => void, t: any, theme: string, setTheme: (s: string) => void, setDeviceType: (d: string | null) => void }) {
   const [form, setForm] = useState(profile);
 
   const themeOptions = [
@@ -1870,6 +1956,19 @@ function ProfileView({ profile, onSave, t, theme, setTheme }: { profile: UserPro
         </button>
       </div>
 
+      <div className="theme-card flex items-center justify-between p-6">
+        <div>
+          <h4 className="font-bold text-main">{t('select_device')}</h4>
+          <p className="text-xs text-muted mt-1">Change your optimized layout view</p>
+        </div>
+        <button 
+          onClick={() => { setDeviceType(null); localStorage.removeItem('device-preference'); }}
+          className="px-6 py-3 rounded-2xl bg-subtle border border-border text-xs font-black text-main uppercase tracking-widest hover:bg-brand/5 hover:border-brand transition-all"
+        >
+          {t('change_layout')}
+        </button>
+      </div>
+
       <div className="p-8 bg-sky-50 rounded-[32px] border border-sky-100/50 flex gap-4 items-start shadow-sm">
         <Info className="text-sky-500 shrink-0 mt-1" size={20} />
         <p className="text-sm text-sky-700/70 font-medium leading-relaxed">
@@ -1882,81 +1981,157 @@ function ProfileView({ profile, onSave, t, theme, setTheme }: { profile: UserPro
 
 function PowerCutView({ t }: { t: any }) {
   const [area, setArea] = useState('');
-  const [city, setCity] = useState('');
+  const [result, setResult] = useState<{ city: string, portal: string, link: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async () => {
     if (!area.trim()) return;
     setLoading(true);
+    setError(null);
     try {
       const response = await axios.post('/api/ai/beeknoee', {
-        model: 'glm-4.5-flash',
+        model: 'glm-4.7-flash', 
         messages: [
-          { role: 'system', content: t('ai_power_system') },
-          { role: 'user', content: t('ai_power_prompt')(area) }
+          { 
+            role: 'system', 
+            content: 'Bạn là chuyên gia về mạng lưới điện Việt Nam. Dựa trên tên khu vực người dùng nhập, hãy xác định tỉnh/thành phố và đơn vị điện lực quản lý. Trả về JSON: { "city": "Tên tỉnh thành", "portal": "NPC" (Miền Bắc) | "CPC" (Miền Trung) | "SPC" (Miền Nam) | "HANOI" (Hà Nội) | "HCMC" (TP.HCM) }' 
+          },
+          { role: 'user', content: `Khu vực: ${area}` }
         ],
-        temperature: 0.3
+        response_format: { type: 'json_object' },
+        temperature: 0.1
       });
-      setCity(response.data.choices[0].message.content?.trim() || area);
-    } catch (e) {
+
+      const data = JSON.parse(response.data.choices[0].message.content);
+      
+      let portalLink = '';
+      switch (data.portal) {
+        case 'HANOI': portalLink = 'https://evnhanoi.vn/search/power-cut'; break;
+        case 'HCMC': portalLink = 'https://www.evnhcmc.vn/khach-hang/lich-ngung-giam-cung-cap-dien'; break;
+        case 'NPC': portalLink = 'https://cskh.npc.com.vn/LichNgungGiamCungCapDien/LichNgungGiamCungCapDien'; break;
+        case 'CPC': portalLink = 'https://cskh.cpc.vn/tra-cuu/lich-tam-ngung-cung-cap-dien'; break;
+        case 'SPC': portalLink = 'https://cskh.evnspc.vn/TraCuu/LichNgungGiamCungCapDien'; break;
+        default: portalLink = `https://www.google.com/search?q=${encodeURIComponent(`lịch cúp điện ${data.city || area}`)}`;
+      }
+
+      setResult({
+        city: data.city || area,
+        portal: data.portal || 'UNKNOWN',
+        link: portalLink
+      });
+    } catch (e: any) {
       console.error("AI Error:", e);
-      setCity(area);
+      setError(e.response?.data?.error || "Không thể kết nối với AI. Vui lòng thử lại.");
+      // Fallback
+      setResult({
+        city: area,
+        portal: 'UNKNOWN',
+        link: `https://www.google.com/search?q=${encodeURIComponent(`lịch cúp điện ${area}`)}`
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const directLink = city ? `https://www.google.com/search?q=${encodeURIComponent(`lịch cúp điện ${city} site:evn.com.vn OR site:evnhcmc.com.vn OR site:evnhanoi.vn`)}` : '#';
+  const regions = [
+    { name: 'Hà Nội', portal: 'EVN Hà Nội', link: 'https://evnhanoi.vn/search/power-cut', color: 'bg-red-50 text-red-600' },
+    { name: 'TP. HCM', portal: 'EVN TP.HCM', link: 'https://www.evnhcmc.vn/khach-hang/lich-ngung-giam-cung-cap-dien', color: 'bg-blue-50 text-blue-600' },
+    { name: 'Miền Bắc', portal: 'EVN NPC', link: 'https://cskh.npc.com.vn/LichNgungGiamCungCapDien/LichNgungGiamCungCapDien', color: 'bg-orange-50 text-orange-600' },
+    { name: 'Miền Trung', portal: 'EVN CPC', link: 'https://cskh.cpc.vn/tra-cuu/lich-tam-ngung-cung-cap-dien', color: 'bg-green-50 text-green-600' },
+    { name: 'Miền Nam', portal: 'EVN SPC', link: 'https://cskh.evnspc.vn/TraCuu/LichNgungGiamCungCapDien', color: 'bg-indigo-50 text-indigo-600' },
+  ];
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="theme-card">
         <h3 className="text-3xl font-black mb-4 font-display text-brand">{t('evn_title')}</h3>
         <p className="text-slate-500 text-sm mb-8 font-medium">{t('evn_desc')}</p>
-        <div className="flex gap-3 mb-10">
-          <input 
-            className="theme-input flex-1"
-            placeholder={t('locality')}
-            value={area}
-            onChange={e => setArea(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSearch()}
-          />
-          <button onClick={handleSearch} disabled={loading} className="theme-btn-primary min-w-[140px] flex items-center justify-center gap-2 bg-warning shadow-warning/20">
-            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : t('weather_btn')}
+        
+        <div className="flex gap-3 mb-6">
+          <div className="relative flex-1">
+            <input 
+              className="theme-input w-full pr-10"
+              placeholder={t('locality')}
+              value={area}
+              onChange={e => setArea(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            />
+            {area && (
+              <button 
+                onClick={() => { setArea(''); setResult(null); setError(null); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          <button 
+            onClick={handleSearch} 
+            disabled={loading} 
+            className="theme-btn-primary min-w-[140px] flex items-center justify-center gap-2 bg-amber-500 shadow-amber-200"
+          >
+            {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Search size={20} />}
           </button>
         </div>
 
-        {city && (
-          <div className="p-10 bg-indigo-50 border border-indigo-100 rounded-[32px] text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="w-20 h-20 bg-white text-warning rounded-[24px] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-indigo-100">
-                <Zap size={40} />
-             </div>
-             <h4 className="text-2xl font-black text-slate-800 mb-2">{city} {t('grid_report')}</h4>
-             <p className="text-slate-500 text-sm mb-10 leading-relaxed font-medium">
-              {t('aqi_desc')}
-             </p>
-             <a 
-              href={directLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="theme-btn-primary bg-slate-800 shadow-slate-200"
-             >
-                {t('launch_protocol')} {city} <ExternalLink size={20} className="inline ml-2" />
-             </a>
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-xs font-bold animate-in fade-in">
+            ⚠️ {error}
           </div>
         )}
+
+        <AnimatePresence mode="wait">
+          {result && (
+            <motion.div 
+              key="result"
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: -10 }}
+              className="p-8 bg-amber-50 border border-amber-100 rounded-[32px] text-center mb-4"
+            >
+               <div className="w-16 h-16 bg-white text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <Zap size={32} />
+               </div>
+               <h4 className="text-xl font-black text-slate-800 mb-1">{result.city}</h4>
+               <p className="text-slate-500 text-[10px] mb-8 uppercase tracking-widest font-black opacity-60">Provider Protocol: {result.portal}</p>
+               
+               <a 
+                href={result.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-10 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:translate-y-[-2px] transition-all shadow-xl shadow-slate-200"
+               >
+                  {t('launch_protocol')} <ExternalLink size={18} />
+               </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="theme-card">
-          <h5 className="font-black text-slate-800 mb-2 flex items-center gap-3"><Zap size={18} className="text-warning" /> {t('evn_north')}</h5>
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-4">{t('domain_capital')}</p>
-          <a href="https://evnhanoi.vn/search/power-cut" target="_blank" className="text-xs font-black text-brand hover:underline">Access Terminal →</a>
-        </div>
-        <div className="theme-card">
-          <h5 className="font-black text-main mb-2 flex items-center gap-3"><Zap size={18} className="text-warning" /> {t('evn_south')}</h5>
-          <p className="text-xs text-muted font-bold uppercase tracking-widest mb-4">{t('domain_metro')}</p>
-          <a href="https://www.evnhcmc.vn/khach-hang/lich-ngung-giam-cung-cap-dien" target="_blank" className="text-xs font-black text-brand hover:underline">Access Terminal →</a>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {regions.map((reg, idx) => (
+          <a 
+            key={idx}
+            href={reg.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-white border border-border p-4 rounded-2xl hover:border-brand/40 group transition-all text-center flex flex-col items-center justify-center"
+          >
+            <div className={`w-10 h-10 ${reg.color} rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+              <Zap size={18} />
+            </div>
+            <div className="font-black text-main text-[11px] leading-tight mb-1">{reg.name}</div>
+            <div className="text-[8px] text-muted font-black uppercase tracking-tighter">{reg.portal}</div>
+          </a>
+        ))}
+      </div>
+
+      <div className="p-6 bg-slate-50 border border-slate-100 rounded-[32px] flex gap-4 items-start shadow-sm">
+        <Info className="text-brand/50 mt-1 shrink-0" size={20} />
+        <div className="text-[11px] text-slate-500 font-medium leading-relaxed">
+          <strong>Hướng dẫn:</strong> Nhập chính xác tên Tỉnh/Thành phố hoặc Quận/Huyện để AI xác định cổng thông tin EVN tương ứng. 
+          Ví dụ: "Đà Nẵng", "Cần Thơ", "Quận Tân Bình"...
         </div>
       </div>
     </div>
